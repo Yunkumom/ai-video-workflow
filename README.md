@@ -123,7 +123,7 @@ Launch the dedicated studio editor to calibrate subtitles, adjust reframing, or 
 
 ```text
 ai-video-workflow/
-├── GUIDE.html                      # Interactive visual user guide (雙語互動使用指南)
+├── guide.html                      # Interactive visual user guide (雙語互動使用指南)
 ├── AI Video Workflow v7.command    # One-click desktop launcher (macOS 桌面啟動器)
 ├── input/                          # Public folder skeleton: raw media inputs (本地素材入口)
 ├── processing/                     # Public folder skeleton: intermediate render state (中間處理區)

@@ -1,0 +1,44 @@
+{
+  "schema": "shine.video.template-gallery.v1",
+  "format": {
+    "aspect_ratio": "9:16",
+    "width": 1080,
+    "height": 1920,
+    "audio": "silent",
+    "flash_policy": "isolated-scene-transitions"
+  },
+  "subtitle_templates": [
+    {
+      "id": "clean-impact",
+      "name_zh_tw": "乾淨重擊",
+      "description_zh_tw": "白色粗體、深色描邊、短促入場，適合清楚直接的重點句。"
+    },
+    {
+      "id": "keyword-punch",
+      "name_zh_tw": "關鍵字跳出",
+      "description_zh_tw": "主句維持白色，黃色關鍵字在語音重拍瞬間放大。"
+    },
+    {
+      "id": "split-reveal",
+      "name_zh_tw": "黃字裂開補白",
+      "description_zh_tw": "黃色前句上下裂開，白色後句或情緒重點插入中央。"
+    }
+  ],
+  "editing_templates": [
+    {
+      "id": "flash-cut",
+      "name_zh_tw": "黑白閃切",
+      "description_zh_tw": "使用短暫白閃連接硬切，不做持續快速閃爍。"
+    },
+    {
+      "id": "punch-zoom",
+      "name_zh_tw": "重點推近",
+      "description_zh_tw": "畫面快速推向重點後回彈，製造節奏與靠近感。"
+    },
+    {
+      "id": "freeze-hit",
+      "name_zh_tw": "定格重擊",
+      "description_zh_tw": "動作在重拍停止，加入框線與標籤標記關鍵瞬間。"
+    }
+  ]
+}

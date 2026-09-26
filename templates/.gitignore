@@ -1,0 +1,5 @@
+# Private drafts and work copies; source catalog and tests remain tracked.
+*.template-draft.json
+*.subtitle-workspace.json
+generated/
+previews/

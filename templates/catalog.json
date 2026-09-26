@@ -1,0 +1,75 @@
+{
+  "schema": "shine.subtitle.catalog.v1",
+  "styles": [
+    {
+      "id": "S01",
+      "name_zh_tw": "貼字黑底",
+      "slug": "fitted-black",
+      "version": 1,
+      "status": "testing",
+      "appearance": {
+        "background": "fitted-line",
+        "outline": false,
+        "weight": "bold",
+        "accent": null
+      },
+      "motion": "none"
+    },
+    {
+      "id": "S02",
+      "name_zh_tw": "清晰描邊",
+      "slug": "clear-outline",
+      "version": 1,
+      "status": "testing",
+      "appearance": {
+        "background": "transparent",
+        "outline": true,
+        "weight": "bold",
+        "accent": null
+      },
+      "motion": "none"
+    },
+    {
+      "id": "S03",
+      "name_zh_tw": "乾淨重擊",
+      "slug": "clean-impact",
+      "version": 1,
+      "status": "testing",
+      "appearance": {
+        "background": "transparent",
+        "outline": true,
+        "weight": "heavy",
+        "accent": null
+      },
+      "motion": "impact"
+    },
+    {
+      "id": "S04",
+      "name_zh_tw": "關鍵字跳出",
+      "slug": "keyword-punch",
+      "version": 1,
+      "status": "testing",
+      "appearance": {
+        "background": "transparent",
+        "outline": true,
+        "weight": "heavy",
+        "accent": "#ffd84d"
+      },
+      "motion": "keyword-punch"
+    },
+    {
+      "id": "S05",
+      "name_zh_tw": "黃字裂開補白",
+      "slug": "split-reveal",
+      "version": 1,
+      "status": "testing",
+      "appearance": {
+        "background": "transparent",
+        "outline": true,
+        "weight": "heavy",
+        "accent": "#ffd84d"
+      },
+      "motion": "split-reveal"
+    }
+  ]
+}

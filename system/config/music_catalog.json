@@ -1,0 +1,27 @@
+{
+  "schema": "shine.video.music-catalog.v1",
+  "tracks": [
+    {
+      "id": "mixkit-serene-view-443",
+      "title": "Serene View",
+      "provider": "Mixkit",
+      "source_url": "https://mixkit.co/free-stock-music/mood/relaxed/",
+      "download_url": "https://assets.mixkit.co/music/443/443.mp3",
+      "mood": [
+        "relaxed",
+        "atmospheric",
+        "calm",
+        "vlog",
+        "art",
+        "food"
+      ],
+      "pace": "slow",
+      "duration": 114,
+      "instrumental": true,
+      "commercial_use": true,
+      "attribution_required": false,
+      "license_url": "https://mixkit.co/license/",
+      "license_evidence": "Reviewed 2026-08-29: Mixkit identifies stock music as Free License; its official music page states tracks may be used in YouTube, social media, blogs, websites, podcasts, music videos, and online advertisements, and attribution is appreciated but not required; CDs, DVDs, video games, and TV/radio broadcasts are excluded."
+    }
+  ]
+}

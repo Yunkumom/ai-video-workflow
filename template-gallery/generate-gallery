@@ -1,0 +1,111 @@
+#!/bin/zsh
+set -eu
+
+gallery_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+generated_dir="$gallery_dir/generated"
+preview_dir="$generated_dir/previews"
+renderer="$gallery_dir/render_gallery.swift"
+templates=(gallery clean-impact keyword-punch split-reveal flash-cut punch-zoom freeze-hit)
+
+require_tool() {
+  command -v "$1" >/dev/null 2>&1 || {
+    print -u2 "[ERROR] Required tool is missing: $1"
+    exit 2
+  }
+}
+
+next_version() {
+  local prefix="$1"
+  local maximum=0 candidate suffix version
+  setopt local_options null_glob
+  for candidate in "${prefix}_v"*.mp4; do
+    suffix=${candidate##*_v}
+    version=${suffix%.mp4}
+    if [[ "$version" == <-> ]] && (( version > maximum )); then
+      maximum=$version
+    fi
+  done
+  print $((maximum + 1))
+}
+
+list_templates() {
+  printf '%s\n' "${templates[@]}"
+}
+
+render_one() {
+  local template="$1" output_dir stem version frames output
+  if [[ "$template" == "gallery" ]]; then
+    output_dir="$generated_dir"
+    stem="shine-template-gallery"
+  else
+    output_dir="$preview_dir"
+    stem="template-$template"
+  fi
+  mkdir -p "$output_dir"
+  version=$(next_version "$output_dir/$stem")
+  frames="$generated_dir/frames/${template}_v${version}"
+  output="$output_dir/${stem}_v${version}.mp4"
+  mkdir -p "$frames"
+
+  swift "$renderer" \
+    --template "$template" \
+    --output-dir "$frames" \
+    --width 540 \
+    --height 960 \
+    --fps 12
+
+  ffmpeg -hide_banner -loglevel error -y \
+    -framerate 12 \
+    -i "$frames/frame-%05d.png" \
+    -vf "scale=1080:1920:flags=lanczos,fps=30,format=yuv420p" \
+    -c:v libx264 \
+    -preset veryfast \
+    -crf 18 \
+    -movflags +faststart \
+    "$output"
+
+  ffprobe -v error \
+    -select_streams v:0 \
+    -show_entries stream=codec_name,width,height \
+    -show_entries format=duration \
+    -of default=noprint_wrappers=1 \
+    "$output" >/dev/null
+  print "$output"
+}
+
+require_tool swift
+require_tool ffmpeg
+require_tool ffprobe
+
+case "${1:-}" in
+  --list)
+    list_templates
+    ;;
+  --next-version)
+    [[ $# -eq 2 ]] || {
+      print -u2 "Usage: generate-gallery --next-version <output-prefix>"
+      exit 2
+    }
+    next_version "$2"
+    ;;
+  --all)
+    for template in "${templates[@]}"; do
+      render_one "$template"
+    done
+    ;;
+  --template)
+    [[ $# -eq 2 ]] || {
+      print -u2 "Usage: generate-gallery --template <name>"
+      exit 2
+    }
+    if (( ${templates[(Ie)$2]} == 0 )); then
+      print -u2 "[ERROR] Unknown template: $2"
+      exit 2
+    fi
+    render_one "$2"
+    ;;
+  *)
+    print -u2 "Usage: generate-gallery <--all|--list|--template name>"
+    exit 2
+    ;;
+esac

@@ -1,0 +1,24 @@
+{
+  "schema": "shine.video.modes.v1",
+  "active": {
+    "tutorial": {
+      "audio_mode": "original-audio",
+      "subtitles": "automatic",
+      "aspect_ratio": "original"
+    },
+    "silent-footage": {
+      "audio_mode": "source-or-silence",
+      "script": "optional",
+      "aspect_ratio": "original"
+    }
+  },
+  "future": {
+    "ai-narration": {
+      "enabled": false,
+      "provider": null,
+      "requires_script_approval": true,
+      "requires_explicit_consent": true,
+      "voice_profile_in_manifest": false
+    }
+  }
+}

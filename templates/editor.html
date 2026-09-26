@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; media-src blob:; img-src blob: data:; connect-src 'self'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>AI Video Workflow v1</title>
+<style>
+:root{color-scheme:dark;--bg:#101210;--panel:#191c18;--line:#353b31;--ink:#f0f3e9;--muted:#9ea796;--accent:#d5fa75;--danger:#ffb0a2;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;font-size:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}button,input,select,textarea{font:inherit}button{cursor:pointer;color:inherit;background:#232820;border:1px solid var(--line);border-radius:6px;padding:8px 12px}button:hover{border-color:var(--accent)}button:disabled{opacity:.4;cursor:default}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}input,select,textarea{color:var(--ink);background:#11150f;border:1px solid var(--line);border-radius:5px;padding:8px;min-width:0}textarea{resize:vertical;line-height:1.45}label{display:grid;gap:6px;color:var(--muted);font-size:12px}[hidden]{display:none!important}.primary{background:var(--accent);border-color:var(--accent);color:#17220c;font-weight:700}.quiet{background:transparent}.muted{color:var(--muted);font-size:12px}.app{height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}.topbar{height:56px;flex-shrink:0;display:flex;align-items:center;gap:22px;padding:0 20px;border-bottom:1px solid var(--line);background:#151913}.brand{display:flex;align-items:center;gap:10px;white-space:nowrap}.brand-dot{width:10px;height:10px;border-radius:3px;background:var(--accent)}h1{font-size:15px;font-weight:650;margin:0;letter-spacing:-.025em}.flow-tabs{display:flex;height:100%;align-items:stretch;gap:4px}.flow-tabs button{background:transparent;border:0;border-bottom:2px solid transparent;border-radius:0;color:var(--muted);padding:0 15px;font-size:13px}.flow-tabs button[aria-selected="true"]{border-bottom-color:var(--accent);color:var(--accent)}.top-end{margin-left:auto;display:flex;gap:12px;align-items:center}.mode{color:var(--muted);font-size:11px;white-space:nowrap}#menu-button{font-size:20px;line-height:1;padding:5px 9px}.menu{position:absolute;right:16px;top:50px;z-index:20;width:270px;padding:6px;background:#232a1f;border:1px solid var(--line);border-radius:8px;box-shadow:0 12px 45px #0009}.menu button{display:block;text-align:left;width:100%;border:0;background:transparent;font-size:13px;padding:12px}.menu button:hover{background:#343e2b}.panel{display:flex;flex-direction:column;flex:1;min-height:0;padding:18px 24px;gap:14px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}.panel-head h2{font-size:18px;margin:0 0 5px}.actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.list-shell{border:1px solid var(--line);border-radius:8px;background:var(--panel);display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}.list-head,.file-row{display:grid;grid-template-columns:45px minmax(140px,1fr) 135px 100px 130px;align-items:center;gap:12px;padding:12px 16px}.list-head{background:#1e2519;color:var(--muted);font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--line)}.file-list{min-height:0;overflow:auto;flex:1}.file-row{border-bottom:1px solid #2b3127;min-height:73px}.file-row:last-child{border-bottom:0}.file-row.selected{background:#252f1c}.clip-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.clip-name button{max-width:100%;overflow:hidden;text-overflow:ellipsis;text-align:left;padding:0;border:0;background:none;color:var(--ink)}.clip-name small{display:block;margin-top:4px;color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis}.row-number{color:var(--muted);font-variant-numeric:tabular-nums}.row-status{font-size:12px;overflow:hidden;text-overflow:ellipsis}.row-status.error{color:var(--danger)}.sort-buttons{display:flex;gap:4px;justify-content:flex-end}.sort-buttons button{padding:5px 9px}.empty{display:grid;place-items:center;text-align:center;height:100%;min-height:170px;padding:20px}.empty h3{font-size:22px;font-weight:550;margin:15px 0 8px}.empty-symbol{display:inline-block;font-size:28px;color:var(--accent);border:1px solid #455437;border-radius:12px;padding:12px 20px}.pager{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-shrink:0}.pager-controls{display:flex;align-items:center;gap:12px}.pager span{font-size:12px;color:var(--muted)}.clipbar{display:flex;align-items:center;gap:9px;flex-shrink:0}.clipbar select{flex:1;max-width:440px}.clipbar .actions{margin-left:auto}.process-grid{display:grid;grid-template-columns:minmax(300px,.95fr) minmax(420px,1.1fr);gap:14px;flex:1;min-height:0}.preview-panel,.cue-panel{border:1px solid var(--line);border-radius:8px;background:var(--panel);display:flex;flex-direction:column;min-height:0;overflow:hidden}.mini-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:12px;flex-shrink:0}.video-stage{flex:1;min-height:100px;position:relative;display:flex;justify-content:center;align-items:center;background:#050605;overflow:hidden}.video-frame{position:relative;flex:none;max-width:100%;max-height:100%;overflow:hidden;container-type:inline-size}.video-frame video{width:100%;height:100%;display:block;object-fit:contain}.video-placeholder{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:var(--muted);padding:20px;text-align:center}.caption{position:absolute;left:0;right:0;bottom:8%;text-align:center;color:white;font-size:4.5cqw;font-weight:800;line-height:1.3;pointer-events:none}.caption-line{display:block;margin:.12em auto;white-space:pre-wrap}.caption-ink{display:inline-block;max-width:94%;padding:.07em .25em .12em;border-radius:.12em;box-decoration-break:clone;-webkit-box-decoration-break:clone}.caption.style-s01 .caption-ink{background:rgba(0,0,0,.84);text-shadow:0 .03em .08em #000}.caption.style-s02 .caption-ink,.caption.style-s03 .caption-ink,.caption.style-s04 .caption-ink,.caption.style-s05 .caption-ink{-webkit-text-stroke:.07em #000;paint-order:stroke fill;text-shadow:0 .04em .08em #000}.caption.style-s03{font-weight:950}.caption.style-s04 .caption-ink,.caption.style-s05 .caption-line:first-child .caption-ink{color:#ffd84d}.player{display:flex;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--line);flex-shrink:0}.player input{flex:1;min-width:20px;accent-color:var(--accent)}.player span{font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}.cue-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:9px 12px;border-bottom:1px solid var(--line)}.cue-toolbar button{font-size:12px;padding:6px 9px}.groupbar{display:flex;align-items:center;gap:6px;padding:9px 12px}.groupbar select{flex:1;font-size:12px}.groupbar button{padding:5px 9px}.cue-list{padding:0 12px;overflow:auto;flex:1;min-height:0}.cue-row{padding:9px 0;border-top:1px solid #333b2c}.cue-row.active{border-left:2px solid var(--accent);padding-left:7px}.cue-meta{display:flex;gap:8px;align-items:center;margin-bottom:5px;font-size:11px;color:var(--muted)}.cue-meta button{padding:2px 5px;background:transparent;border:0;color:var(--muted);font-size:11px;white-space:nowrap}.cue-row textarea{width:100%;resize:none;min-height:46px;height:46px;padding:5px 7px;font-size:13px}.cue-row .note{margin-top:3px;width:100%;font-size:11px;padding:4px 7px;border-color:transparent;background:transparent;color:#c4d7b0}.cue-row .note:focus{background:#10170c;border-color:var(--line)}.cue-footer{padding:9px 12px;border-top:1px solid var(--line)}.statusbar{height:32px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);background:#151913;overflow:hidden}.statusbar [role=status]{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1}.statusbar[data-kind=error]{color:var(--danger)}#stop-button{padding:3px 7px;font-size:11px}.output-row{display:grid;grid-template-columns:40px minmax(100px,1fr) 130px auto;align-items:center;gap:14px;padding:18px 16px;border-bottom:1px solid var(--line)}.output-row .actions button{font-size:12px}.output-list{overflow:auto;flex:1;min-height:0}dialog{color:var(--ink);background:#1c2318;border:1px solid #4e6040;border-radius:12px;padding:0;width:min(680px,calc(100vw - 30px));max-height:85dvh;box-shadow:0 25px 100px #000b}dialog::backdrop{background:#0009;backdrop-filter:blur(3px)}.dialog-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}.dialog-head h2{font-size:17px;margin:0}.dialog-body{padding:18px 20px;max-height:60dvh;overflow:auto;line-height:1.65}.dialog-body p{margin:0 0 14px}.dialog-body label{margin:10px 0}.dialog-body textarea{width:100%;min-height:110px}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;padding:13px 20px;border-top:1px solid var(--line)}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dialog-error{color:var(--danger);font-size:12px;min-height:18px;white-space:pre-wrap}.template-tabs{display:flex;gap:8px;margin-bottom:12px}.template-tabs button[aria-selected=true]{border-color:var(--accent);color:var(--accent)}.template-card{display:block;width:100%;text-align:left;margin:7px 0;padding:12px}.template-card .meta{display:block;font-size:11px;color:var(--muted);margin-top:3px}.template-card[aria-pressed=true]{border-color:var(--accent)}.consent-list{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:#11180e;padding:12px;max-height:230px;overflow:auto}.check{display:flex!important;align-items:center;gap:9px;font-size:13px!important}.proposal-row{padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;white-space:pre-wrap}.proposal-row del{color:#daa697;display:block}.proposal-row ins{color:var(--accent);display:block;text-decoration:none}.progress{color:var(--accent)}.spacer{flex:1}
+@media(max-width:1050px){.topbar{gap:12px;padding:0 12px}.mode{display:none}.panel{padding:12px}.process-grid{grid-template-columns:minmax(230px,.8fr) minmax(340px,1fr)}.file-row,.list-head{grid-template-columns:30px minmax(100px,1fr) 100px 75px 95px;gap:7px}.sort-buttons button{padding:5px 7px}.flow-tabs button{padding:0 10px}}
+@media(max-width:760px){.topbar{height:84px;flex-wrap:wrap;gap:0;align-content:center;position:relative}.brand{height:34px}.top-end{height:34px}.flow-tabs{order:3;width:100%;height:40px}.flow-tabs button{flex:1}.panel{padding:9px;gap:8px}.panel-head{align-items:flex-start}.panel-head h2{font-size:15px}.panel-head .actions{justify-content:flex-end}.actions button{font-size:11px;padding:7px}.list-head{display:none}.file-row{grid-template-columns:22px minmax(90px,1fr) 78px;padding:10px;gap:7px}.file-row .duration,.file-row .sidecar{display:none}.file-row .row-status{grid-column:2;font-size:10px}.file-row .sort-buttons{grid-column:3;grid-row:span 2}.clipbar{flex-wrap:wrap;gap:5px}.clipbar select{max-width:none}.clipbar .actions{width:100%;justify-content:flex-end}.process-grid{grid-template-columns:1fr;grid-template-rows:minmax(120px,.7fr) minmax(220px,1.3fr);gap:7px}.preview-panel .mini-head{display:none}.player{padding:5px 8px}.player button{padding:4px 8px}.cue-toolbar{padding:5px 8px;gap:4px}.groupbar{padding:5px 8px}.cue-footer{padding:5px 8px}.cue-row{padding:6px 0}.output-row{grid-template-columns:22px minmax(80px,1fr);gap:8px;padding:12px}.output-row .actions{grid-column:2}.output-row .row-status{grid-column:2}.statusbar{padding:0 10px;font-size:11px}.form-grid{grid-template-columns:1fr}.menu{top:40px}}
+.video-frame #photo-preview{width:100%;height:100%;object-fit:contain;display:block}.sort-buttons button{padding:5px 7px}.row-status button{padding:3px 5px;font-size:11px;color:var(--danger)}#photo-controls{display:flex;align-items:center;gap:8px;font-size:12px;padding:7px 12px}#photo-duration{width:85px}.mini-head #clip-phase{max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cue-list .empty button{margin-top:12px}.caption{overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="topbar">
+  <div class="brand"><span class="brand-dot"></span><h1>AI Video Workflow v1</h1></div>
+  <nav class="flow-tabs" role="tablist" aria-label="工作流程">
+    <button id="stage-input" role="tab" aria-selected="true" aria-controls="panel-input" data-stage="input">1 Input</button>
+    <button id="stage-process" role="tab" aria-selected="false" aria-controls="panel-process" data-stage="process">2 Process</button>
+    <button id="stage-output" role="tab" aria-selected="false" aria-controls="panel-output" data-stage="output">3 Output</button>
+  </nav>
+  <div class="top-end"><span class="mode" id="controller-mode" data-mode="standalone">離線預覽</span><button id="menu-button" aria-label="開啟選單" aria-expanded="false" aria-controls="main-menu">☰</button></div>
+</header>
+<div class="menu" id="main-menu" hidden>
+  <button id="guide-button">GUI Guide · 使用說明</button>
+  <button id="save-work-button" data-mutate>保存字幕與註解 · 私人工作檔</button>
+  <button id="load-work-button" data-mutate>載入私人工作檔</button>
+  <button id="export-draft-button">匯出通用樣式草稿</button>
+</div>
+<input type="file" id="folder-input" webkitdirectory multiple hidden>
+<input type="file" id="video-input" accept="video/*,image/jpeg,image/png,.mp4,.mov,.m4v,.webm,.jpg,.jpeg,.png,.srt" multiple hidden>
+<input type="file" id="work-input" accept=".json" hidden>
+
+<section class="panel" id="panel-input" role="tabpanel" aria-labelledby="stage-input">
+  <div class="panel-head"><div><h2>素材清單 <span id="batch-count" class="muted">0 項</span></h2><div id="folder-label" class="muted">影片與 JPG／PNG 照片，一起載入、分開處理</div></div>
+  <div class="actions"><button id="undo-remove" class="quiet" data-mutate disabled>復原移除</button><button id="undo-order" class="quiet" data-mutate>復原排序</button><button id="natural-sort" class="quiet" data-mutate>檔名排序</button><button id="ai-order" class="quiet" data-mutate>AI 排序建議</button><button id="choose-folder" class="primary" data-mutate>＋ 載入資料夾</button><button id="choose-files" data-mutate>選擇影片／照片</button></div></div>
+  <div class="list-shell"><div class="list-head"><span>順序</span><span>素材</span><span>處理狀態</span><span>字幕來源</span><span style="text-align:right">調整順序</span></div>
+    <div class="file-list" id="file-list"></div>
+  </div>
+  <div class="pager"><div class="pager-controls"><button id="input-prev" aria-label="上一頁影片">←</button><span id="input-page">1 / 1</span><button id="input-next" aria-label="下一頁影片">→</button></div><div class="actions"><button id="go-process">開始校對</button><button id="analyze-all" class="primary" data-mutate>完整辨識未處理影片</button></div></div>
+</section>
+
+<section class="panel" id="panel-process" role="tabpanel" aria-labelledby="stage-process" hidden>
+  <div class="clipbar"><button id="clip-prev" aria-label="上一支影片">←</button><select id="clip-select" aria-label="目前影片"><option>尚未載入影片</option></select><button id="clip-next" aria-label="下一支影片">→</button><span id="clip-position" class="muted">0 / 0</span>
+    <div class="actions"><button id="source-button" data-mutate>載入字幕／逐字稿</button><button id="analyze-current" data-mutate>辨識這支</button><button id="process-button" class="primary" data-mutate>輸出這支影片</button></div>
+  </div>
+  <div class="process-grid">
+    <article class="preview-panel"><div class="mini-head"><span id="orientation-label">影片預覽</span><span id="clip-phase" class="progress"></span></div>
+      <div class="video-stage" id="video-stage"><div class="video-frame" id="video-frame"><video id="video-preview" playsinline preload="metadata"></video><img id="photo-preview" alt="照片素材預覽" hidden><div id="caption-preview" class="caption style-s01" aria-live="off"></div></div><div id="video-placeholder" class="video-placeholder">從 Input 載入影片後，在這裡對照字幕</div></div>
+      <div id="photo-controls" hidden><label for="photo-duration">照片顯示秒數</label><input id="photo-duration" type="number" min=".1" max="3600" step=".1" value="5" data-mutate><button id="apply-photo-duration" data-mutate>套用秒數</button></div><div class="player"><button id="play-button">播放</button><input id="time-slider" type="range" min="0" max="1" value="0" step=".01" aria-label="影片預覽時間"><span id="clock">00:00 / 00:00</span></div>
+    </article>
+    <article class="cue-panel">
+      <div class="cue-toolbar"><button id="add-cue-button" class="primary" data-mutate>＋ 新增字幕</button><button id="template-button" data-mutate>樣式 · S01 貼字黑底</button><button id="range-button" data-mutate>分段／重切</button><button id="group-note-button" data-mutate>註解整段</button><button id="ai-correct" data-mutate>AI 修正本片註解</button><button id="undo-button" data-mutate>復原</button></div>
+      <div class="groupbar"><button id="group-prev" aria-label="上一段字幕">‹</button><select id="group-select" aria-label="字幕段落"><option>尚無字幕</option></select><button id="group-next" aria-label="下一段字幕">›</button></div>
+      <div class="cue-list" id="cue-list"></div>
+      <div class="pager cue-footer"><span id="cue-count">0 句</span><div class="pager-controls"><button id="cue-prev" aria-label="上一頁字幕">←</button><span id="cue-page">1 / 1</span><button id="cue-next" aria-label="下一頁字幕">→</button></div></div>
+    </article>
+  </div>
+</section>
+
+<section class="panel" id="panel-output" role="tabpanel" aria-labelledby="stage-output" hidden>
+  <div class="panel-head"><div><h2>獨立成果</h2><span class="muted">每支影片各自輸出 MP4 與 SRT，不合併</span></div><button id="render-all" class="primary" data-mutate>輸出所有已校對影片</button></div>
+  <div class="list-shell"><div id="output-list" class="output-list"></div></div>
+  <div class="pager"><div class="pager-controls"><button id="output-prev" aria-label="上一頁成果">←</button><span id="output-page">1 / 1</span><button id="output-next" aria-label="下一頁成果">→</button></div><button id="open-output-button" disabled>開啟目前影片 Output</button></div>
+</section>
+<footer class="statusbar" id="statusbar"><span id="status-message" role="status">準備就緒</span><button id="stop-button" hidden>停止後續影片</button></footer>
+</main>
+
+<dialog id="add-cue-dialog"><div class="dialog-head"><h2>新增字幕</h2><button data-close aria-label="關閉新增字幕">✕</button></div><div class="dialog-body">
+<div class="form-grid"><label>開始時間<input id="new-cue-start"></label><label>結束時間<input id="new-cue-end"></label></div>
+<label>字幕內容<textarea id="new-cue-text" maxlength="1000" placeholder="直接輸入這一句，不需要先做語音辨識"></textarea></label><p class="muted">預設從播放位置之後的空白時段加入；不覆蓋現有字幕。超長文字依每行字數切句，請再對照時間。</p><div id="add-cue-error" class="dialog-error"></div></div><div class="dialog-actions"><button data-close>取消</button><button id="confirm-add-cue" class="primary">加入字幕</button></div></dialog>
+<dialog id="error-dialog"><div class="dialog-head"><h2 id="error-title">處理說明</h2><button data-close aria-label="關閉處理說明">✕</button></div><div class="dialog-body"><p id="error-message"></p><p class="muted">既有 V1 的同名 SRT 可一起載入。已燒在畫面上的文字不能直接當作可編輯字幕。</p></div><div class="dialog-actions"><button data-close>知道了</button></div></dialog>
+<dialog id="guide-dialog"><div class="dialog-head"><h2>GUI Guide</h2><button data-close aria-label="關閉使用說明">✕</button></div><div class="dialog-body">
+<p><b>本次試用修正</b>　中央「＋」可載入資料夾；影片與 JPG／JPEG／PNG 照片可以混排。「×」只移出工作清單，不刪原檔，可按「復原移除」。HEIC 等格式請先轉為 JPG／PNG。</p>
+<p><b>手動新增</b>　Process 按「＋ 新增字幕」，設定起迄時間與文字即可，不必先辨識。照片預設 5 秒，可輸入秒數後按「套用秒數」，不可縮短到現有字幕之前；照片不做語音辨識，也可不加字幕直接輸出靜態影片。</p>
+<p><b>辨識未設定</b>　缺少 GROQ_API_KEY 時會在送出前提示，仍能手動校對與輸出。請保留既有 V1 的同名 SRT；已燒在影像上的字幕不是可編輯文字。</p>
+<p><b>1 Input</b>　載入整個資料夾，先依檔名自然排序；用 ↑ ↓ 調整，影片多時翻頁，同資料夾同名 SRT 會自動配對。</p>
+<p><b>2 Process</b>　逐支完整辨識，再切換影片、段落和字幕頁；每句可編輯文字、時間與註解，點時間即可定位影片。</p>
+<p><b>分段／重切</b>　閱讀段落只整理字幕；重切會依所選完整時間範圍重新分句，時間為估算，需對照影片確認；直式每行 10 字、橫式每行 16 字，最多兩行。</p>
+<p><b>AI 協作</b>　排序只依檔名提出建議，不聲稱看過影片；修正只送出本片有註解的字幕與註解，使用既有 Groq 服務，每次都需確認，先預覽提案再套用。</p>
+<p><b>3 Output</b>　每支影片分開輸出，不自動刪除停頓、裁切或合併；失敗不會阻止其他影片，已完成輸出保留版本。</p>
+<p><b>保存工作</b>　☰ 可保存私人工作檔，包含字幕與註解但沒有影片；下次先選相同資料夾再載入工作檔，關閉網頁前請保存，工作檔不是已核准的模板。</p>
+<p><b>離線／增強版</b>　直接開啟本檔可預覽、校對及匯出 SRT；雙擊 AI Video Workflow v7.command 可開啟目前的桌面編輯器，外部服務金鑰需已存在啟動環境，程式不讀取金鑰檔案。</p>
+<p><b>模板</b>　Mature 只收你明確確認已成熟的版本；S01～S05 保留 v1，S03～S05 成片目前為靜態基礎，不能把示意當成已驗證動態。</p>
+</div><div class="dialog-actions"><button data-close class="primary">知道了</button></div></dialog>
+
+<dialog id="template-dialog"><div class="dialog-head"><h2>字幕樣式</h2><button data-close aria-label="關閉字幕樣式">✕</button></div><div class="dialog-body">
+<div class="template-tabs" role="tablist" aria-label="字幕成熟度"><button id="mature-tab" role="tab" aria-selected="true" data-status="mature">Mature · 已成熟</button><button id="testing-tab" role="tab" aria-selected="false" data-status="testing">Testing · 測試中</button></div><div id="template-cards" role="tabpanel"></div>
+</div></dialog>
+
+<dialog id="source-dialog"><div class="dialog-head"><h2>這支影片的字幕來源</h2><button data-close aria-label="關閉字幕來源">✕</button></div><div class="dialog-body">
+<label>載入既有 SRT<input id="srt-input" type="file" accept=".srt" data-mutate></label><label>或貼上逐字稿<textarea id="transcript-input" placeholder="逐字稿切句的時間是估算值，需對照影片校對。" data-mutate></textarea></label><p class="muted">套用會取代本片目前字幕，可使用「復原」回到套用前。</p><div class="dialog-error" id="source-error"></div>
+</div><div class="dialog-actions"><button data-close>取消</button><button id="segment-button" class="primary" data-mutate>切句並套用逐字稿</button></div></dialog>
+
+<dialog id="range-dialog"><div class="dialog-head"><h2>字幕分段與重切</h2><button data-close aria-label="關閉分段設定">✕</button></div><div class="dialog-body">
+<div class="form-grid"><label>開始時間<input id="range-start" placeholder="00:00.000"></label><label>結束時間<input id="range-end" placeholder="02:30.000"></label><label>希望分成幾句<input id="sentence-count" type="number" min="1" max="10000"></label><label>希望分成幾段<input id="paragraph-count" type="number" min="1" max="10000"></label></div>
+<p class="muted">預設帶入目前段落的完整時間範圍；「只分閱讀段落」保留每句原時間，「重新切句」則依字數估算新時間，請再對照影片。</p><div id="range-error" class="dialog-error"></div>
+</div><div class="dialog-actions"><button id="group-only-button">只分閱讀段落</button><button id="resegment-button" class="primary">重新切句與分段</button></div></dialog>
+
+<dialog id="note-dialog"><div class="dialog-head"><h2>註解目前段落</h2><button data-close aria-label="關閉段落註解">✕</button></div><div class="dialog-body"><p id="note-range" class="muted"></p><label>給 AI 的修正要求<textarea id="group-note" maxlength="600" placeholder="例如：這段提到的工具名稱應該是……"></textarea></label><div id="note-error" class="dialog-error"></div></div><div class="dialog-actions"><button data-close>取消</button><button id="apply-group-note" class="primary">附加到本段各句</button></div></dialog>
+
+<dialog id="consent-dialog"><div class="dialog-head"><h2 id="consent-title">確認本次外部處理</h2><button data-close aria-label="取消外部處理">✕</button></div><div class="dialog-body"><p id="consent-description"></p><div id="consent-summary" class="consent-list"></div><label class="check"><input id="approve-network" type="checkbox">我同意僅將以上資料送往 Groq 進行這次處理</label><div id="consent-error" class="dialog-error"></div></div><div class="dialog-actions"><button data-close>取消</button><button id="confirm-network" class="primary">確認並開始</button></div></dialog>
+
+<dialog id="proposal-dialog"><div class="dialog-head"><h2 id="proposal-title">AI 提案預覽</h2><button data-close aria-label="不套用提案">✕</button></div><div class="dialog-body"><p class="muted">原始資料尚未更動；確認後才套用。</p><div id="proposal-list"></div><div id="proposal-error" class="dialog-error"></div></div><div class="dialog-actions"><button data-close>不套用</button><button id="apply-proposal" class="primary">確認套用</button></div></dialog>
+
+<script id="workflow-core">
+
+const WorkflowCore = (() => {
+  'use strict';
+  const clone = value => JSON.parse(JSON.stringify(value));
+  const fail = text => { throw new Error(text); };
+  const keys = (value, names) => value && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).sort().join('|') === names.slice().sort().join('|');
+  const videoPattern = /\.(mp4|mov|m4v|webm|mkv|avi)$/i;
+  const photoPattern = /\.(jpg|jpeg|png)$/i;
+  function createClips(files, idFactory) {
+    const relative = file => (file.webkitRelativePath || file.name).normalize('NFC');
+    const all = Array.from(files).filter(file=>!relative(file).split('/').some(part=>part.startsWith('.')));
+    const subtitles = new Map();
+    for (const file of all.filter(f => /\.srt$/i.test(f.name))) {
+      const key = relative(file).replace(/\.srt$/i,'');
+      if (subtitles.has(key)) fail('同一路徑有重複的字幕檔。');
+      subtitles.set(key,file);
+    }
+    const seen = new Set();
+    return all.filter(f=>videoPattern.test(f.name)||photoPattern.test(f.name)).sort((a,b)=>relative(a).localeCompare(relative(b),'zh-TW',{numeric:true,sensitivity:'base'})).map(file=>{
+      const relativeName = relative(file);
+      if (relativeName.split('/').some(x=>x==='..') || seen.has(relativeName)) fail('影片路徑重複或無效。');
+      seen.add(relativeName);
+      return {id:idFactory(),name:file.name,relativeName,file,srtFile:subtitles.get(relativeName.replace(/\.[^.]+$/,'')) || null,
+        kind:photoPattern.test(file.name)?'photo':'video',cues:[],templateId:'S01',duration:photoPattern.test(file.name)?5:0,width:0,height:0,groupPage:0,cuePage:0,
+        importedProject:null,importedFilename:null,phase:photoPattern.test(file.name)?'照片 · 可加字幕':'待辨識',error:'',output:null,undo:[],transcript:''};
+    });
+  }
+  const speechCandidates=clips=>clips.filter(c=>c.kind!=='photo'&&!c.cues.length);
+  function removeClip(clips,id){
+    const index=clips.findIndex(c=>c.id===id);
+    if(index<0)fail('素材已不在清單中。');
+    return {clips:clips.filter(c=>c.id!==id),removed:{clip:clips[index],index}};
+  }
+  function restoreClip(clips,removed){
+    if(!removed||clips.some(c=>c.id===removed.clip.id))fail('素材已存在，不能重複復原。');
+    const result=clips.slice();result.splice(Math.min(removed.index,result.length),0,removed.clip);return result;
+  }
+  function photoDuration(value,cues){
+    if(typeof value!=='number'||!Number.isFinite(value)||value<.1||value>3600)fail('照片顯示時間需為 0.1～3600 秒。');
+    if(cues.some(c=>c.end>value))fail('照片時間短於現有字幕，請先調整字幕結束時間。');
+    return value;
+  }
+  function insertCue(cues,cue,duration,limit=16){
+    if(!Number.isFinite(duration)||duration<=0)fail('請先載入素材長度。');
+    const checked=validateCues([cue],duration)[0];
+    if(cues.some(c=>c.start<checked.end&&c.end>checked.start))fail('新增字幕與原字幕時間重疊；請選擇空白時段。');
+    const additions=reflow([{...checked,group:'manual-'+checked.start}],limit);
+    return validateCues([...cues,...additions].sort((a,b)=>a.start-b.start),duration);
+  }
+  function page(items,index,size=6) {
+    const pages=Math.max(1,Math.ceil(items.length/size));
+    index=Math.max(0,Math.min(pages-1,Number.isFinite(index)?Math.floor(index):0));
+    return {items:items.slice(index*size,(index+1)*size),index,pages,start:index*size,total:items.length};
+  }
+  function move(items,id,delta) {
+    const result=items.slice(), old=result.findIndex(x=>x.id===id);
+    if(old<0) return result;
+    const next=Math.max(0,Math.min(result.length-1,old+delta));
+    result.splice(next,0,result.splice(old,1)[0]); return result;
+  }
+  function applyOrder(items,order) {
+    if(!Array.isArray(order)||order.length!==items.length||new Set(order).size!==items.length) fail('排序清單重複或不完整。');
+    const map=new Map(items.map(x=>[x.id,x]));
+    if(order.some(id=>!map.has(id))) fail('排序包含不明影片。');
+    return order.map(id=>map.get(id));
+  }
+  function time(value) {
+    if(typeof value==='number') { if(!Number.isFinite(value)||value<0) fail('時間無效。'); return value; }
+    const parts=String(value).trim().replace(',','.').split(':');
+    if(!parts.length||parts.length>3||parts.some(x=>!/^\d+(?:\.\d+)?$/.test(x))) fail('請輸入分:秒或時:分:秒。');
+    const nums=parts.map(Number);
+    if(nums.length>1 && nums.slice(1).some(x=>x>=60)) fail('分秒欄位必須小於 60。');
+    return time(nums.reduce((sum,n)=>sum*60+n,0));
+  }
+  function clock(value, precise=false) {
+    const ms=Math.round(Math.max(0,Number.isFinite(value)?value:0)*1000);
+    const hours=Math.floor(ms/3600000), minutes=Math.floor(ms/60000)%60, seconds=Math.floor(ms/1000)%60;
+    return (hours?String(hours).padStart(2,'0')+':':'')+String(hours?minutes:Math.floor(ms/60000)).padStart(2,'0')+':'+String(seconds).padStart(2,'0')+(precise?'.'+String(ms%1000).padStart(3,'0'):'');
+  }
+  function validateCues(cues,duration=Infinity) {
+    if(!Array.isArray(cues)||cues.length>10000) fail('字幕數量無效。');
+    let end=0;
+    return cues.map((cue,i)=>{
+      if(!cue||typeof cue.start!=='number'||typeof cue.end!=='number'||!Number.isFinite(cue.start)||!Number.isFinite(cue.end)
+         ||cue.start<end||cue.end<=cue.start||cue.end>duration+.05||typeof cue.text!=='string'||!cue.text.trim()||cue.text.length>1000) fail('字幕時間重疊、超出影片或內容無效。');
+      if(cue.note!==undefined&&(typeof cue.note!=='string'||cue.note.length>1000)) fail('註解太長或無效。');
+      if(cue.group!==undefined&&(typeof cue.group!=='string'||cue.group.length>100)) fail('段落無效。');
+      end=cue.end;
+      return {start:cue.start,end:cue.end,text:cue.text,note:cue.note||'',group:cue.group||'g'+Math.floor(i/8)};
+    });
+  }
+  function parseSrt(text) {
+    const result=[];
+    for(const block of text.replace(/^\uFEFF/,'').replace(/\r\n?/g,'\n').trim().split(/\n{2,}/)) {
+      const lines=block.split('\n'), idx=lines.findIndex(x=>x.includes('-->'));
+      if(idx<0) fail('SRT 區塊缺少時間。');
+      const m=lines[idx].match(/^(\d{2,}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2,}:\d{2}:\d{2}[,.]\d{3})$/);
+      if(!m) fail('SRT 時間格式錯誤。');
+      result.push({start:time(m[1]),end:time(m[2]),text:lines.slice(idx+1).join('\n')});
+    }
+    if(!result.length) fail('沒有可用字幕。');
+    return validateCues(result);
+  }
+  const tokens = text => text.match(/[A-Za-z][A-Za-z0-9._/+:-]*|\d+(?:[.,×xX:/-]\d+)*(?:[%％℃°年月日時分秒個支張台公尺分]*)|./gs)||[];
+  function wrap(text,limit) {
+    let line=''; const lines=[];
+    for(const token of tokens(text)) {
+      if(line&&[...line+token].length>limit) { lines.push(line); line=''; }
+      line+=token;
+    }
+    if(line)lines.push(line);
+    return lines;
+  }
+  function segment(text,limit=16) {
+    text=text.trim().replace(/\r\n?/g,'\n').replace(/\n/g,'');
+    const clauses=text.match(/.+?(?:[。！？!?；;，,]|$)/gs)||[];
+    const lines=[]; let current='';
+    for(const clause of clauses) {
+      if([...current+clause].length<=limit) current+=clause;
+      else { if(current)lines.push(current); current=''; const chunk=wrap(clause,limit); lines.push(...chunk.slice(0,-1)); current=chunk.at(-1)||''; }
+    }
+    if(current)lines.push(current);
+    return Array.from({length:Math.ceil(lines.length/2)},(_,i)=>lines.slice(i*2,i*2+2).join('\n'));
+  }
+  function distribute(blocks,start,end,extra={}) {
+    const total=blocks.reduce((n,s)=>n+[...s.replace(/\n/g,'')].length,0); let used=0;
+    return blocks.map((text,i)=>{const a=start+(end-start)*used/total; used+=[...text.replace(/\n/g,'')].length;
+      return {...extra,start:a,end:i===blocks.length-1?end:start+(end-start)*used/total,text};});
+  }
+  function reflow(cues,limit=16) {
+    return validateCues(cues.flatMap(c=>distribute(segment(c.text,limit),c.start,c.end,{note:c.note||'',group:c.group||'g0'})));
+  }
+  function captionAt(cues,at,limit=16) {
+    const cue=cues.find(c=>at>=c.start&&at<c.end);
+    if(!cue||!cue.text.trim())return '';
+    return distribute(segment(cue.text,limit),cue.start,cue.end).find(c=>at>=c.start&&at<c.end)?.text||'';
+  }
+  function groupCues(cues,count) {
+    if(!Number.isInteger(count)||count<1||count>cues.length) fail('段數必須介於 1 與字幕句數之間。');
+    return cues.map((c,i)=>({...c,group:'g'+Math.floor(i*count/cues.length)}));
+  }
+  function splitExact(text,count,limit) {
+    const ts=tokens(text), lengths=ts.map(x=>[...x].length), total=lengths.reduce((a,b)=>a+b,0);
+    if(!Number.isInteger(count)||count<1||count>ts.length||count>10000||total>count*limit*2) fail('指定句數不足以符合字數限制，請增加句數。');
+    let pos=0, remaining=total;const result=[];
+    for(let i=0;i<count;i++) {
+      const left=count-i-1,target=remaining/(left+1);let width=0,best=-1,score=Infinity;
+      for(let j=pos;j<ts.length-left;j++) {
+        width+=lengths[j]; if(width>2*limit)break;
+        if(remaining-width>left*2*limit)continue;
+        if(left===0&&j!==ts.length-1)continue;
+        const candidate=ts.slice(pos,j+1).join('');
+        if(wrap(candidate,limit).length>2)continue;
+        const penalty=/[。！？!?；;，,]\s*$/.test(candidate)?0:2;
+        const value=Math.abs(width-target)+penalty;
+        if(value<score){best=j+1;score=value;}
+      }
+      if(best<0)fail('句數與字數限制無法同時滿足，請增加句數。');
+      const part=ts.slice(pos,best).join(''); result.push(wrap(part,limit).join('\n'));
+      remaining-=[...part].length;pos=best;
+    }
+    return result;
+  }
+  function resegment(cues,start,end,count,paragraphs,limit) {
+    validateCues(cues);
+    if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start)fail('時間範圍無效。');
+    const indices=cues.map((c,i)=>c.end>start&&c.start<end?i:-1).filter(i=>i>=0);
+    if(!indices.length)fail('範圍內沒有字幕。');
+    const first=indices[0],last=indices.at(-1);
+    if(Math.abs(cues[first].start-start)>.01||Math.abs(cues[last].end-end)>.01)fail('請選取完整字幕範圍，避免切掉半句。');
+    const selected=cues.slice(first,last+1),text=selected.map(c=>c.text.replace(/\n/g,'')).join('');
+    const note=[...new Set(selected.map(c=>c.note).filter(Boolean))].join('；');
+    if(note.length>1000)fail('註解過多，請縮小重切範圍。');
+    const blocks=splitExact(text,count,limit), grouped=groupCues(distribute(blocks,start,end,{note}),paragraphs)
+      .map(c=>({...c,group:'r'+start+'-'+end+'-'+c.group}));
+    return [...cues.slice(0,first),...grouped,...cues.slice(last+1)];
+  }
+  function applyCorrections(cues,changes) {
+    if(!Array.isArray(changes)) fail('修正提案無效。');
+    const result=cues.map(c=>({...c})),seen=new Set();
+    for(const change of changes) {
+      if(!keys(change,['index','text'])||!Number.isInteger(change.index)||change.index<0||change.index>=cues.length
+        ||seen.has(change.index)||typeof change.text!=='string'||!change.text.trim()||change.text.length>1000) fail('修正提案包含重複或無效字幕。');
+      seen.add(change.index);result[change.index].text=change.text;
+    }
+    return validateCues(result);
+  }
+  function srt(cues) {
+    const stamp=n=>{const ms=Math.round(n*1000);return String(Math.floor(ms/3600000)).padStart(2,'0')+':'+String(Math.floor(ms/60000)%60).padStart(2,'0')+':'+String(Math.floor(ms/1000)%60).padStart(2,'0')+','+String(ms%1000).padStart(3,'0');};
+    return validateCues(cues).map((c,i)=>[i+1,stamp(c.start)+' --> '+stamp(c.end),c.text,''].join('\n')).join('\n')+'\n';
+  }
+  function exportWork(clips) {
+    return {schema:'shine.subtitle-workspace.v2',clips:clips.map(c=>({relativeName:c.relativeName,size:c.file.size||0,lastModified:c.file.lastModified||0,templateId:c.templateId,kind:c.kind,photoDuration:c.kind==='photo'?c.duration:null,transcript:c.transcript||'',cues:clone(c.cues)}))};
+  }
+  function importWork(payload,clips) {
+    if(!keys(payload,['schema','clips'])||!['shine.subtitle-workspace.v1','shine.subtitle-workspace.v2'].includes(payload.schema)||!Array.isArray(payload.clips)||payload.clips.length>clips.length)fail('工作檔格式或影片數量不符。');
+    const seen=new Set(), map=new Map(clips.map(c=>[c.relativeName,c]));
+    return payload.clips.map(saved=>{
+      const v2=payload.schema==='shine.subtitle-workspace.v2';
+      if(!keys(saved,['relativeName','size','lastModified','templateId','transcript','cues',...(v2?['kind','photoDuration']:[])])||typeof saved.relativeName!=='string'||seen.has(saved.relativeName))fail('工作檔包含不明或重複影片。');
+      seen.add(saved.relativeName); const clip=map.get(saved.relativeName);
+      if(!clip||saved.size!==(clip.file.size||0)||saved.lastModified!==(clip.file.lastModified||0)||typeof saved.templateId!=='string'||!/^S0[1-5]$/.test(saved.templateId)||typeof saved.transcript!=='string'||saved.transcript.length>1000000)fail('工作檔與目前所選影片不符。');
+            if(v2&&(saved.kind!==clip.kind||(clip.kind==='video'&&saved.photoDuration!==null)))fail('素材類型不符。');
+      const duration=clip.kind==='photo'?photoDuration(v2?saved.photoDuration:clip.duration,validateCues(saved.cues)):clip.duration;
+      return {...clip,duration,cues:validateCues(saved.cues,duration||Infinity),templateId:saved.templateId,transcript:saved.transcript,revision:(clip.revision||0)+1,groupPage:0,cuePage:0,undo:[],error:'',phase:saved.cues.length?'待校對':clip.kind==='photo'?'照片 · 可加字幕':'待辨識'};
+    });
+  }
+  return {clone,createClips,speechCandidates,removeClip,restoreClip,photoDuration,insertCue,page,move,applyOrder,time,clock,validateCues,parseSrt,segment,distribute,reflow,captionAt,groupCues,resegment,applyCorrections,srt,exportWork,importWork};
+})();
+if(typeof module !== 'undefined') module.exports=WorkflowCore;
+
+</script>
+<script type="application/json" id="template-catalog">{
+  "schema": "shine.subtitle.catalog.v1",
+  "styles": [
+    {
+      "id": "S01",
+      "name_zh_tw": "貼字黑底",
+      "slug": "fitted-black",
+      "version": 1,
+      "status": "testing",
+      "appearance": {
+        "background": "fitted-line",
+        "outline": false,
+        "weight": "bold",
+        "accent": null
+      },
+      "motion": "none"
+    },
+    {
+      "id": "S02",
+      "name_zh_tw": "清晰描邊",
+      "slug": "clear-outline",
+      "version": 1,
+      "status": "testing",
+      "appearance": {
+        "background": "transparent",
+        "outline": true,
+        "weight": "bold",
+        "accent": null
+      },
+      "motion": "none"
+    },
+    {
+      "id": "S03",
+      "name_zh_tw": "乾淨重擊",
+      "slug": "clean-impact",
+      "version": 1,
+      "status": "testing",
+      "appearance": {
+        "background": "transparent",
+        "outline": true,
+        "weight": "heavy",
+        "accent": null
+      },
+      "motion": "impact"
+    },
+    {
+      "id": "S04",
+      "name_zh_tw": "關鍵字跳出",
+      "slug": "keyword-punch",
+      "version": 1,
+      "status": "testing",
+      "appearance": {
+        "background": "transparent",
+        "outline": true,
+        "weight": "heavy",
+        "accent": "#ffd84d"
+      },
+      "motion": "keyword-punch"
+    },
+    {
+      "id": "S05",
+      "name_zh_tw": "黃字裂開補白",
+      "slug": "split-reveal",
+      "version": 1,
+      "status": "testing",
+      "appearance": {
+        "background": "transparent",
+        "outline": true,
+        "weight": "heavy",
+        "accent": "#ffd84d"
+      },
+      "motion": "split-reveal"
+    }
+  ]
+}</script>
+<script>
+
+(() => {
+'use strict';
+const C=WorkflowCore, $=id=>document.getElementById(id), catalog=JSON.parse($('template-catalog').textContent);
+const state={clips:[],selectedId:null,stage:'input',inputPage:0,outputPage:0,mode:'standalone',token:null,busy:false,stop:false,
+  objectUrl:null,videoId:null,photoTime:0,photoPlaying:false,photoFrame:null,removal:null,dirty:false,templateStatus:'mature',consent:null,proposal:null,orderUndo:null};
+const video=$('video-preview'), photo=$('photo-preview'), caption=$('caption-preview');
+const playhead=()=>selected()?.kind==='photo'?state.photoTime:video.currentTime;
+function pausePhoto(){state.photoPlaying=false;cancelAnimationFrame(state.photoFrame);state.photoFrame=null;}
+function seekTime(time){if(selected()?.kind==='photo')state.photoTime=time;else video.currentTime=time;updateClock();}
+function explain(title,text){$('error-title').textContent=title;$('error-message').textContent=text;$('error-dialog').showModal();}
+const selected=()=>state.clips.find(c=>c.id===state.selectedId);
+const limit=c=>c.height>=c.width&&c.width>0?10:16;
+const cuePageSize=()=>window.innerWidth<760?2:window.innerHeight<760?3:4;
+const make=(tag,text='',cls='')=>{const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e;};
+const button=(text,action,disabled=false)=>{const e=make('button',text);e.type='button';e.disabled=disabled;e.addEventListener('click',action);return e;};
+function message(text,kind=''){ $('status-message').textContent=text;$('statusbar').dataset.kind=kind; }
+function dialogError(id,error){$(id).textContent=error.message||String(error);}
+function guard(action){return (...args)=>{try{const value=action(...args);if(value&&value.catch)value.catch(e=>message(e.message,'error'));}catch(e){message(e.message,'error');}};}
+function dirty(clip,renderChange=true){state.dirty=true;if(clip&&renderChange)clip.revision=(clip.revision||0)+1;}
+function remember(clip){clip.undo.push({cues:C.clone(clip.cues),templateId:clip.templateId,duration:clip.duration});if(clip.undo.length>20)clip.undo.shift();}
+function commit(clip,cues){const checked=C.validateCues(cues,clip.duration||Infinity);remember(clip);clip.cues=checked;clip.error='';clip.phase='待校對';dirty(clip);renderAll();}
+function setBusy(value){state.busy=value;document.querySelectorAll('[data-mutate]').forEach(e=>e.disabled=value);$('stop-button').hidden=!value;renderAll();}
+function activateStage(stage){
+ state.stage=stage;
+ document.querySelectorAll('[data-stage]').forEach(b=>{b.setAttribute('aria-selected',String(b.dataset.stage===stage));b.tabIndex=b.dataset.stage===stage?0:-1;});
+ for(const name of ['input','process','output'])$('panel-'+name).hidden=name!==stage;
+ renderAll();if(stage==='process')requestAnimationFrame(fitVideo);
+}
+function groups(clip){
+ const result=[];for(let i=0;i<clip.cues.length;i++){const cue=clip.cues[i];let g=result.at(-1);
+  if(!g||g.key!==cue.group){g={key:cue.group,indices:[],start:cue.start,end:cue.end};result.push(g);}
+  g.indices.push(i);g.end=cue.end;
+ }return result;
+}
+function currentGroup(clip){const list=groups(clip);clip.groupPage=Math.max(0,Math.min(list.length-1,clip.groupPage||0));return list[clip.groupPage];}
+function displayName(clip){return clip.name.replace(/\.[^.]+$/,'');}
+function hasClips(){if(state.clips.length)return true;message('請先在 Input 載入影片資料夾。','error');activateStage('input');return false;}
+function enhanced(){if(state.mode==='enhanced')return true;message('目前是離線預覽；請雙擊 AI Video Workflow v7.command 使用目前桌面編輯器的辨識、AI 與影片輸出。','error');return false;}
+
+function renderInput(){
+ $('batch-count').textContent=state.clips.length+' 項';$('undo-remove').disabled=state.busy||!state.removal;
+ const list=$('file-list');list.replaceChildren();
+ if(!state.clips.length){const empty=make('div','','empty'),inner=make('div');const add=button('＋',()=>$('folder-input').click(),state.busy);add.id='empty-folder-button';add.className='empty-symbol';add.setAttribute('aria-label','從中央載入素材資料夾');inner.append(add,make('h3','先載入素材資料夾'),make('p','支援影片與 JPG／PNG 照片，同名 SRT 自動配對。','muted'));empty.append(inner);list.append(empty);}
+ const page=C.page(state.clips,state.inputPage,6);state.inputPage=page.index;
+ page.items.forEach((clip,offset)=>{
+  const row=make('div','','file-row'+(clip.id===state.selectedId?' selected':''));
+  row.append(make('span',String(page.start+offset+1).padStart(2,'0'),'row-number'));
+  const name=make('div','','clip-name'),open=button(clip.name,()=>{selectClip(clip.id);activateStage('process');});
+  open.title=clip.relativeName;name.append(open,make('small',clip.relativeName));row.append(name);
+  const status=make('span',clip.error?'':clip.phase,'row-status'+(clip.error?' error':''));if(clip.error)status.append(button('查看失敗原因',()=>explain(clip.name,clip.error)));status.title=clip.error||clip.phase;row.append(status);
+  row.append(make('span',clip.cues.length?clip.cues.length+' 句':clip.srtFile?'SRT':clip.kind==='photo'?'照片 · '+clip.duration+' 秒':'待辨識','muted sidecar'));
+  const actions=make('div','','sort-buttons');
+  actions.append(button('↑',()=>reorder(clip.id,-1),state.busy||page.start+offset===0),button('↓',()=>reorder(clip.id,1),state.busy||page.start+offset===state.clips.length-1));
+  actions.children[0].setAttribute('aria-label','上移 '+clip.name);actions.children[1].setAttribute('aria-label','下移 '+clip.name);const remove=button('×',()=>removeMedia(clip.id),state.busy);remove.setAttribute('aria-label','移除 '+clip.name);remove.title='只從本次清單移除，不刪原檔';actions.append(remove);row.append(actions);list.append(row);
+ });
+ $('input-page').textContent=(page.index+1)+' / '+page.pages;
+ $('input-prev').disabled=page.index===0;$('input-next').disabled=page.index===page.pages-1;
+ $('analyze-all').disabled=state.busy||!state.clips.length;
+}
+function removeMedia(id){
+ if(state.busy)return;const result=C.removeClip(state.clips,id);state.removal=result.removed;state.clips=result.clips;state.orderUndo=null;
+ if(state.selectedId===id){state.selectedId=null;clearPreview();if(state.clips.length)selectClip(state.clips[Math.min(result.removed.index,state.clips.length-1)].id);}
+ dirty();renderAll();message('已從清單移除；原始檔案與既有輸出未刪除，可按「復原移除」。');
+}
+$('undo-remove').addEventListener('click',()=>{if(state.busy||!state.removal)return;const id=state.removal.clip.id;state.clips=C.restoreClip(state.clips,state.removal);state.removal=null;state.orderUndo=null;state.inputPage=Math.floor(state.clips.findIndex(c=>c.id===id)/6);selectClip(id);dirty();renderAll();message('已復原素材及其字幕、註解。');});
+function reorder(id,delta){if(state.busy)return;state.orderUndo=state.clips.map(c=>c.id);state.clips=C.move(state.clips,id,delta);state.inputPage=Math.floor(state.clips.findIndex(c=>c.id===id)/6);dirty();renderAll();}
+function renderSelector(){
+ const select=$('clip-select');select.replaceChildren();
+ if(!state.clips.length)select.append(new Option('尚未載入影片',''));
+ state.clips.forEach((clip,i)=>select.append(new Option((i+1)+'. '+clip.name,clip.id, false,clip.id===state.selectedId)));
+ const index=state.clips.findIndex(c=>c.id===state.selectedId);
+ $('clip-position').textContent=(index+1)+' / '+state.clips.length;
+ $('clip-prev').disabled=index<=0;$('clip-next').disabled=index<0||index>=state.clips.length-1;
+ const clip=selected();
+ $('clip-phase').textContent=clip?(clip.error?'需處理 · 見原因':clip.phase):'';$('clip-phase').onclick=()=>{if(clip?.error)explain(clip.name,clip.error);};
+ $('photo-controls').hidden=clip?.kind!=='photo';$('photo-duration').value=clip?.kind==='photo'?clip.duration:5;$('analyze-current').disabled=state.busy||!clip||clip.kind==='photo';$('add-cue-button').disabled=state.busy||!clip;
+ $('orientation-label').textContent=clip&&clip.width?(clip.height>=clip.width?'直式':'橫式')+' '+clip.width+'×'+clip.height+' · 每行 '+limit(clip)+' 字':'影片預覽';
+ const style=catalog.styles.find(s=>s.id===(clip?.templateId||'S01'));
+ $('template-button').textContent='樣式 · '+style.id+' '+style.name_zh_tw;
+ $('undo-button').disabled=state.busy||!clip||!clip.undo.length;
+}
+function renderCues(){
+ const clip=selected(), list=$('cue-list'), select=$('group-select');
+ list.replaceChildren();select.replaceChildren();
+ if(!clip||!clip.cues.length){
+  select.append(new Option('尚無字幕',''));const e=make('div','','empty'),inner=make('div');inner.append(make('p',clip?.kind==='photo'?'照片可直接新增文字，不需要語音辨識。':'可手動新增字幕、載入 SRT 或貼上逐字稿。','muted'),button('＋ 新增第一句字幕',openAddCue,state.busy||!clip));e.append(inner);list.append(e);caption.replaceChildren();
+  $('cue-count').textContent='0 句';$('cue-page').textContent='1 / 1';
+  for(const id of ['cue-prev','cue-next','group-prev','group-next'])$(id).disabled=true;return;
+ }
+ const all=groups(clip),group=currentGroup(clip);
+ all.forEach((g,i)=>select.append(new Option('第 '+(i+1)+' 段 · '+C.clock(g.start)+'–'+C.clock(g.end)+' · '+g.indices.length+' 句',String(i),false,i===clip.groupPage)));
+ $('group-prev').disabled=clip.groupPage===0;$('group-next').disabled=clip.groupPage===all.length-1;
+ const page=C.page(group.indices,clip.cuePage,cuePageSize());clip.cuePage=page.index;
+ page.items.forEach(index=>{
+  const cue=clip.cues[index],row=make('div','','cue-row');row.dataset.index=index;
+  const meta=make('div','','cue-meta'),seek=button(String(index+1).padStart(2,'0')+' ▶',()=>seekCue(index));
+  seek.setAttribute('aria-label','定位第 '+(index+1)+' 句');
+  const start=make('input'),end=make('input');start.value=C.clock(cue.start,true);end.value=C.clock(cue.end,true);
+  start.setAttribute('aria-label','第 '+(index+1)+' 句開始時間');end.setAttribute('aria-label','第 '+(index+1)+' 句結束時間');
+  for(const input of [start,end]){input.style.width='92px';input.style.fontSize='11px';input.style.padding='3px';input.disabled=state.busy;}
+  const editTime=()=>{try{if(state.busy)return;const revised=C.clone(clip.cues);revised[index].start=C.time(start.value);revised[index].end=C.time(end.value);commit(clip,revised);message('字幕時間已更新。');}catch(e){start.value=C.clock(cue.start,true);end.value=C.clock(cue.end,true);message(e.message,'error');}};
+  start.addEventListener('change',editTime);end.addEventListener('change',editTime);meta.append(seek,start,make('span','→'),end);
+  const text=make('textarea');text.value=cue.text;text.maxLength=1000;text.disabled=state.busy;text.setAttribute('aria-label','第 '+(index+1)+' 句字幕');
+  let textSaved=false;text.addEventListener('focus',()=>textSaved=false);
+  text.addEventListener('input',()=>{if(state.busy)return;if(!textSaved){remember(clip);textSaved=true;}cue.text=text.value;dirty(clip);renderCaption();$('undo-button').disabled=false;});
+  text.addEventListener('blur',()=>{if(!text.value.trim())message('有空白字幕，請填入內容後再輸出。','error');});
+  const note=make('input','','note');note.value=cue.note||'';note.placeholder='＋ 註解給 AI（可留白）';note.maxLength=1000;note.disabled=state.busy;note.setAttribute('aria-label','第 '+(index+1)+' 句註解');
+  note.addEventListener('input',()=>{cue.note=note.value;dirty(clip,false);});
+  row.append(meta,text,note);list.append(row);
+ });
+ $('cue-count').textContent='本片 '+clip.cues.length+' 句 · '+all.length+' 段';
+ $('cue-page').textContent=(page.index+1)+' / '+page.pages;
+ $('cue-prev').disabled=page.index===0;$('cue-next').disabled=page.index===page.pages-1;
+ renderCaption();
+}
+function renderOutput(){
+ const list=$('output-list');list.replaceChildren();const page=C.page(state.clips,state.outputPage,6);state.outputPage=page.index;
+ if(!state.clips.length){const e=make('div','','empty');e.append(make('span','完成字幕校對後，各支影片的成果會出現在這裡。','muted'));list.append(e);}
+ page.items.forEach((clip,i)=>{
+  const row=make('div','','output-row'),name=make('div','','clip-name');name.append(make('span',clip.name),make('small',clip.output?.name||'尚未輸出 MP4'));
+  const stale=clip.output&&clip.output.revision!==(clip.revision||0);
+  row.append(make('span',String(page.start+i+1),'row-number'),name,make('span',stale?'字幕已更新，需重輸出':clip.output?'輸出完成':clip.error?'處理失敗':'待輸出','row-status'+(clip.error?' error':'')));
+  const actions=make('div','','actions');
+  actions.append(button('校對',()=>{selectClip(clip.id);activateStage('process');}),button('SRT',()=>downloadSrt(clip),!clip.cues.length),button('開啟成果',guard(()=>openOutput(clip)),!clip.output));
+  row.append(actions);list.append(row);
+ });
+ $('output-page').textContent=(page.index+1)+' / '+page.pages;$('output-prev').disabled=page.index===0;$('output-next').disabled=page.index===page.pages-1;
+ $('open-output-button').disabled=!selected()?.output;
+ $('render-all').disabled=state.busy||!state.clips.some(c=>c.cues.length||c.kind==='photo');
+}
+function renderAll(){renderInput();renderSelector();renderCues();renderOutput();}
+function clearPreview(){
+ video.pause();pausePhoto();video.removeAttribute('src');video.load();photo.removeAttribute('src');if(state.objectUrl)URL.revokeObjectURL(state.objectUrl);state.objectUrl=null;state.videoId=null;state.photoTime=0;
+ caption.replaceChildren();photo.hidden=true;video.hidden=false;$('video-placeholder').hidden=false;$('play-button').textContent='播放';$('clock').textContent='00:00 / 00:00';$('time-slider').value=0;$('time-slider').max=1;
+}
+function selectClip(id){
+ if(!state.clips.some(c=>c.id===id))return;
+ state.selectedId=id;const clip=selected();
+ if(state.videoId!==id){
+  clearPreview();state.objectUrl=URL.createObjectURL(clip.file);state.videoId=id;video.hidden=clip.kind==='photo';photo.hidden=clip.kind!=='photo';if(clip.kind==='photo')photo.src=state.objectUrl;else{video.src=state.objectUrl;video.load();}
+  $('video-placeholder').hidden=true;$('play-button').textContent='播放';
+ }
+ renderAll();fitVideo();updateClock();
+}
+function fitVideo(){
+ const c=selected(),stage=$('video-stage'),frame=$('video-frame');
+ const ratio=c&&c.width?c.width/c.height:16/9;
+ const width=Math.max(0,Math.min(stage.clientWidth,stage.clientHeight*ratio));
+ frame.style.width=width+'px';frame.style.height=(width/ratio)+'px';
+}
+function renderCaption(){
+ const clip=selected();caption.replaceChildren();if(!clip)return;
+ caption.className='caption style-'+clip.templateId.toLowerCase();
+ const index=clip.cues.findIndex(c=>playhead()>=c.start&&playhead()<c.end);
+ const shown=C.captionAt(clip.cues,playhead(),limit(clip));
+ if(shown)for(const lineText of shown.split('\n')){
+  const line=make('span','','caption-line'),ink=make('span',lineText,'caption-ink');line.append(ink);caption.append(line);
+ }
+ document.querySelectorAll('.cue-row').forEach(row=>row.classList.toggle('active',Number(row.dataset.index)===index));
+}
+function seekCue(index){const clip=selected();if(clip&&clip.cues[index]){seekTime(clip.cues[index].start);renderCaption();}}
+function updateClock(){
+ const duration=selected()?.kind==='photo'?selected().duration:Number.isFinite(video.duration)?video.duration:0;
+ $('clock').textContent=C.clock(playhead())+' / '+C.clock(duration);
+ $('time-slider').max=Math.max(duration,.1);$('time-slider').value=playhead()||0;renderCaption();
+ const clip=selected();if(!clip||(clip.kind==='photo'?!state.photoPlaying:video.paused)||/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;
+ const index=clip.cues.findIndex(c=>playhead()>=c.start&&playhead()<c.end),gs=groups(clip),g=gs.findIndex(x=>x.indices.includes(index));
+ if(g>=0){const p=Math.floor(gs[g].indices.indexOf(index)/cuePageSize());if(clip.groupPage!==g||clip.cuePage!==p){clip.groupPage=g;clip.cuePage=p;renderCues();}}
+}
+video.addEventListener('loadedmetadata',()=>{
+ const clip=selected();if(!clip||clip.kind==='photo'||video.getAttribute('src')!==state.objectUrl)return;clip.width=video.videoWidth;clip.height=video.videoHeight;clip.duration=Number.isFinite(video.duration)?video.duration:0;
+ try{if(clip.cues.length){const normalized=C.reflow(clip.cues,limit(clip));C.validateCues(normalized,clip.duration||Infinity);if(JSON.stringify(normalized)!==JSON.stringify(clip.cues)){clip.cues=normalized;dirty(clip);}}}catch(e){message(e.message,'error');}
+ fitVideo();updateClock();renderAll();
+});
+video.addEventListener('timeupdate',updateClock);video.addEventListener('ended',()=>$('play-button').textContent='播放');
+video.addEventListener('error',()=>{if(selected()?.kind==='video'&&video.getAttribute('src'))message('瀏覽器無法預覽這支影片的編碼；可先轉成 H.264 MP4。','error');});
+photo.addEventListener('load',()=>{const c=selected();if(c?.kind!=='photo'||photo.getAttribute('src')!==state.objectUrl)return;c.width=photo.naturalWidth;c.height=photo.naturalHeight;try{if(c.cues.length){const normalized=C.reflow(c.cues,limit(c));C.validateCues(normalized,c.duration);if(JSON.stringify(normalized)!==JSON.stringify(c.cues)){c.cues=normalized;dirty(c);}}}catch(e){c.error=e.message;message(e.message,'error');}fitVideo();updateClock();renderAll();});
+photo.addEventListener('error',()=>{if(selected()?.kind==='photo')message('無法預覽照片，請使用可讀取的 JPG 或 PNG。','error');});
+new ResizeObserver(fitVideo).observe($('video-stage'));
+window.addEventListener('resize',()=>{fitVideo();renderCues();});
+$('play-button').addEventListener('click',guard(async()=>{if(!selected())return;if(selected().kind==='photo'){
+ if(state.photoPlaying){pausePhoto();$('play-button').textContent='播放';return;}
+ if(state.photoTime>=selected().duration)state.photoTime=0;state.photoPlaying=true;$('play-button').textContent='暫停';let last=performance.now();
+ const tick=now=>{if(!state.photoPlaying||selected()?.kind!=='photo')return;state.photoTime=Math.min(selected().duration,state.photoTime+(now-last)/1000);last=now;updateClock();if(state.photoTime>=selected().duration){pausePhoto();$('play-button').textContent='播放';}else state.photoFrame=requestAnimationFrame(tick);};state.photoFrame=requestAnimationFrame(tick);return;
+ }if(video.paused){await video.play();$('play-button').textContent='暫停';}else{video.pause();$('play-button').textContent='播放';}}));
+$('time-slider').addEventListener('input',()=>{if(selected()){seekTime(Number($('time-slider').value));}});
+function newId(){return Array.from(crypto.getRandomValues(new Uint8Array(12)),x=>x.toString(16).padStart(2,'0')).join('');}
+async function loadFiles(files){
+ if(state.busy)return;
+ if(state.dirty&&!confirm('載入新資料夾會取代目前工作區；請先從 ☰ 保存私人工作檔，仍要繼續嗎？'))return;
+ const clips=C.createClips(files,newId);if(!clips.length)throw new Error('資料夾內沒有支援的影片或 JPG／PNG 照片；HEIC 等格式請先轉成 JPG。');
+ if(clips.length>1000)throw new Error('一次最多載入 1000 支影片，請分批選取資料夾。');
+ setBusy(true);
+ try{
+  for(const clip of clips)if(clip.srtFile){try{if(clip.srtFile.size>2*1024*1024)throw new Error('SRT 超過 2 MB');clip.cues=C.reflow(C.parseSrt(await clip.srtFile.text()),16);clip.phase='待校對';}catch(e){clip.error=e.message;clip.phase='SRT 待修正';}}
+  state.clips=clips;state.selectedId=clips[0].id;state.inputPage=0;state.outputPage=0;state.dirty=false;state.orderUndo=null;state.removal=null;
+  $('folder-label').textContent=clips[0].relativeName.includes('/')?clips[0].relativeName.split('/')[0]:'自選影片';
+  selectClip(clips[0].id);activateStage('input');const unsupported=Array.from(files).filter(f=>/\.(heic|heif|webp|gif|tiff?|bmp)$/i.test(f.name));message('已載入 '+clips.length+' 項素材；各項字幕與輸出互相獨立。');if(unsupported.length)explain('部分照片尚未載入','這次略過 '+unsupported.length+' 個未支援格式（如 HEIC／WebP）。請先轉成 JPG／PNG 再載入；原檔未更動。');
+ }finally{setBusy(false);}
+}
+$('choose-folder').addEventListener('click',()=>$('folder-input').click());
+$('choose-files').addEventListener('click',()=>$('video-input').click());
+for(const id of ['folder-input','video-input'])$(id).addEventListener('change',guard(async e=>{await loadFiles(e.target.files);e.target.value='';}));
+$('natural-sort').addEventListener('click',()=>{if(state.busy)return;state.orderUndo=state.clips.map(c=>c.id);state.clips.sort((a,b)=>a.relativeName.localeCompare(b.relativeName,'zh-TW',{numeric:true,sensitivity:'base'}));dirty();renderAll();});
+$('undo-order').addEventListener('click',()=>{if(state.busy||!state.orderUndo)return;const previous=state.clips.map(c=>c.id);state.clips=C.applyOrder(state.clips,state.orderUndo);state.orderUndo=previous;dirty();renderAll();});
+for(const stage of ['input','process','output'])$('stage-'+stage).addEventListener('click',()=>activateStage(stage));
+document.querySelector('.flow-tabs').addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight'].includes(e.key))return;e.preventDefault();const names=['input','process','output'];const i=(names.indexOf(state.stage)+(e.key==='ArrowRight'?1:2))%3;activateStage(names[i]);$('stage-'+names[i]).focus();});
+$('go-process').addEventListener('click',()=>{if(hasClips())activateStage('process');});
+$('clip-select').addEventListener('change',e=>selectClip(e.target.value));
+$('clip-prev').addEventListener('click',()=>selectClip(state.clips[state.clips.findIndex(c=>c.id===state.selectedId)-1]?.id));
+$('clip-next').addEventListener('click',()=>selectClip(state.clips[state.clips.findIndex(c=>c.id===state.selectedId)+1]?.id));
+for(const prefix of ['input','output'])for(const [suffix,delta]of [['prev',-1],['next',1]])$(prefix+'-'+suffix).addEventListener('click',()=>{state[prefix+'Page']+=delta;renderAll();});
+$('group-select').addEventListener('change',e=>{const c=selected();if(c){c.groupPage=Number(e.target.value);c.cuePage=0;renderCues();}});
+for(const [prefix,field]of [['group','groupPage'],['cue','cuePage']])for(const [suffix,delta]of [['prev',-1],['next',1]])$(prefix+'-'+suffix).addEventListener('click',()=>{const c=selected();if(c){c[field]+=delta;if(prefix==='group')c.cuePage=0;renderCues();}});
+
+function openAddCue(){
+ const c=selected();if(!c||state.busy)return;
+ if(!c.duration){message('請稍候素材載入長度後再新增字幕。','error');return;}
+ let start=Math.max(0,playhead()||0),end=c.duration;
+ for(const cue of c.cues){if(cue.end<=start)continue;if(cue.start<=start)start=cue.end;else{end=cue.start;break;}}
+ end=Math.min(end,start+2,c.duration);$('new-cue-start').value=C.clock(start,true);$('new-cue-end').value=C.clock(end,true);$('new-cue-text').value='';$('add-cue-error').textContent=end<=start?'目前位置之後沒有空白時段，請指定其他不重疊的時間。':'';$('add-cue-dialog').showModal();
+}
+$('add-cue-button').addEventListener('click',openAddCue);
+$('confirm-add-cue').addEventListener('click',()=>{try{const c=selected();if(!c||state.busy)return;const start=C.time($('new-cue-start').value),end=C.time($('new-cue-end').value),text=$('new-cue-text').value;commit(c,C.insertCue(c.cues,{start,end,text},c.duration,limit(c)));c.groupPage=groups(c).findIndex(g=>g.indices.some(i=>c.cues[i].start===start));c.cuePage=0;seekTime(start);renderCues();$('add-cue-dialog').close();message('已新增字幕，原有字幕未覆蓋。');}catch(e){dialogError('add-cue-error',e);}});
+$('apply-photo-duration').addEventListener('click',()=>{const c=selected();if(c?.kind!=='photo'||state.busy)return;try{const duration=C.photoDuration(Number($('photo-duration').value),c.cues);remember(c);c.duration=duration;state.photoTime=Math.min(state.photoTime,duration);dirty(c);updateClock();renderAll();message('照片顯示時間已更新。');}catch(e){$('photo-duration').value=c.duration;message(e.message,'error');}});
+function renderTemplates(){
+ const cards=$('template-cards');cards.replaceChildren();document.querySelectorAll('[data-status]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.status===state.templateStatus)));
+ const styles=catalog.styles.filter(s=>s.status===state.templateStatus);
+ if(!styles.length){cards.append(make('p','尚無已成熟的字幕 Template；只有你確認後才升級。','muted'),button('查看 Testing',()=>{state.templateStatus='testing';renderTemplates();}));return;}
+ for(const style of styles){const b=button(style.id+' · v'+style.version+'　'+style.name_zh_tw,()=>{const c=selected();if(c){remember(c);c.templateId=style.id;dirty(c);renderAll();renderCaption();}$('template-dialog').close();});
+  b.className='template-card';b.setAttribute('aria-pressed',String(selected()?.templateId===style.id));
+  b.append(make('span',style.motion==='none'?'基礎字幕樣式':'動態示意 · 成片目前為靜態基礎','meta'));cards.append(b);}
+}
+$('template-button').addEventListener('click',()=>{if(!hasClips())return;state.templateStatus='mature';renderTemplates();$('template-dialog').showModal();});
+document.querySelectorAll('[data-status]').forEach(b=>b.addEventListener('click',()=>{state.templateStatus=b.dataset.status;renderTemplates();}));
+$('source-button').addEventListener('click',()=>{if(!hasClips())return;$('source-error').textContent='';$('transcript-input').value=selected().transcript||'';$('source-dialog').showModal();});
+$('transcript-input').addEventListener('input',()=>{if(selected()){selected().transcript=$('transcript-input').value;state.dirty=true;}});
+$('srt-input').addEventListener('change',async e=>{try{const file=e.target.files[0],c=selected();if(!file||!c)return;if(file.size>2*1024*1024)throw new Error('SRT 不得超過 2 MB。');const cues=C.reflow(C.parseSrt(await file.text()),limit(c));commit(c,cues);$('source-dialog').close();message('已載入這支影片的 SRT。');}catch(error){dialogError('source-error',error);}finally{e.target.value='';}});
+$('segment-button').addEventListener('click',()=>{try{const c=selected();if(!c||!c.duration)throw new Error('請等影片載入長度後再切句。');const blocks=C.segment($('transcript-input').value,limit(c));if(!blocks.length)throw new Error('請貼上逐字稿。');const cues=C.distribute(blocks,0,c.duration);commit(c,C.groupCues(cues,Math.ceil(cues.length/8)));$('source-dialog').close();message('已切句；逐字稿時間為估算，請對照影片確認。');}catch(e){dialogError('source-error',e);}});
+$('range-button').addEventListener('click',()=>{const c=selected(),g=c&&currentGroup(c);if(!g){message('請先載入字幕。','error');return;}$('range-start').value=C.clock(g.start,true);$('range-end').value=C.clock(g.end,true);$('sentence-count').value=g.indices.length;$('paragraph-count').value=1;$('range-error').textContent='';$('range-dialog').showModal();});
+function rangeIndices(c,start,end){const indices=c.cues.map((cue,i)=>cue.end>start&&cue.start<end?i:-1).filter(i=>i>=0);if(!indices.length||Math.abs(c.cues[indices[0]].start-start)>.01||Math.abs(c.cues[indices.at(-1)].end-end)>.01)throw new Error('請選取完整字幕的開始與結束時間。');return indices;}
+$('group-only-button').addEventListener('click',()=>{try{const c=selected(),indices=rangeIndices(c,C.time($('range-start').value),C.time($('range-end').value)),count=Number($('paragraph-count').value),updated=C.clone(c.cues);C.groupCues(indices.map(i=>c.cues[i]),count).forEach((cue,i)=>updated[indices[i]]={...cue,group:'read'+indices[0]+'-'+cue.group});commit(c,updated);c.groupPage=0;c.cuePage=0;renderCues();$('range-dialog').close();message('閱讀段落已更新，原字幕時間未改動。');}catch(e){dialogError('range-error',e);}});
+$('resegment-button').addEventListener('click',()=>{try{const c=selected();const cues=C.resegment(c.cues,C.time($('range-start').value),C.time($('range-end').value),Number($('sentence-count').value),Number($('paragraph-count').value),limit(c));commit(c,cues);c.groupPage=0;c.cuePage=0;renderCues();$('range-dialog').close();message('已重新切句；新時間為估算，請對照影片校對。');}catch(e){dialogError('range-error',e);}});
+$('group-note-button').addEventListener('click',()=>{const c=selected(),g=c&&currentGroup(c);if(!g)return;$('group-note').value='';$('note-error').textContent='';$('note-range').textContent=C.clock(g.start)+'–'+C.clock(g.end)+'，共 '+g.indices.length+' 句';$('note-dialog').showModal();});
+$('apply-group-note').addEventListener('click',()=>{try{const c=selected(),g=currentGroup(c),note=$('group-note').value.trim();if(!note)throw new Error('請輸入本段註解。');const cues=C.clone(c.cues);g.indices.forEach(i=>cues[i].note=[cues[i].note,note].filter(Boolean).join('；'));commit(c,cues);$('note-dialog').close();message('註解已附加到本段各句，尚未送出 AI。');}catch(e){dialogError('note-error',e);}});
+$('undo-button').addEventListener('click',()=>{const c=selected();if(!c||state.busy||!c.undo.length)return;const previous=c.undo.pop();c.cues=previous.cues;c.templateId=previous.templateId;if(c.kind==='photo'&&previous.duration){c.duration=previous.duration;state.photoTime=Math.min(state.photoTime,c.duration);}dirty(c);updateClock();renderAll();message('已復原上一個字幕或樣式修改。');});
+
+async function api(route,payload){
+ const response=await fetch(route,{method:'POST',headers:{'Content-Type':'application/json','X-Workflow-Token':state.token},body:JSON.stringify(payload)});
+ const data=await response.json();if(!response.ok)throw new Error(data.error||'本機處理失敗。');return data;
+}
+async function ensureMedia(clip){
+ const project=displayName(clip).normalize('NFC').replace(/[\\/:*?"<>|]+/g,'-').replace(/^\.+|\.+$/g,'').trim().slice(0,42)||'video';
+ const projectId=project+'-'+clip.id.slice(0,12);
+ const sameImportedMedia=clip.importedProject===projectId&&clip.importedFilename===clip.file.name;
+ if(!sameImportedMedia){
+  message('正在匯入 '+clip.name+'…');
+  const response=await fetch('/api/import?'+new URLSearchParams({project:projectId,filename:clip.file.name}),{method:'POST',headers:{'X-Workflow-Token':state.token,'Content-Type':'application/octet-stream'},body:clip.file});
+  const result=await response.json();if(!response.ok)throw new Error(result.error||'影片匯入失敗。');clip.importedProject=projectId;clip.importedFilename=clip.file.name;
+ }
+ return projectId;
+}
+async function poll(jobId,onProgress){
+ for(;;){await new Promise(resolve=>setTimeout(resolve,650));const response=await fetch('/api/jobs/'+encodeURIComponent(jobId),{headers:{'X-Workflow-Token':state.token},cache:'no-store'});const job=await response.json();if(!response.ok)throw new Error(job.error||'無法讀取工作。');if(job.status==='failed')throw new Error(job.error||'處理失敗。');if(job.status==='complete')return job;if(onProgress)onProgress(job.message);}
+}
+async function inspectLocalVideo(clip){
+ if(clip.width&&clip.height&&clip.duration)return;
+ if(clip.kind==='photo'){const preview=new Image(),url=URL.createObjectURL(clip.file);try{preview.src=url;await preview.decode();clip.width=preview.naturalWidth;clip.height=preview.naturalHeight;C.photoDuration(clip.duration,clip.cues);}finally{URL.revokeObjectURL(url);}return;}
+ const probe=document.createElement('video'),url=URL.createObjectURL(clip.file);probe.preload='metadata';
+ try{await new Promise((resolve,reject)=>{
+  const timer=setTimeout(()=>reject(new Error('無法讀取影片資訊，請先分析影片或轉成可預覽的 MP4。')),30000);
+  probe.onloadedmetadata=()=>{clearTimeout(timer);if(!Number.isFinite(probe.duration)||!probe.videoWidth||!probe.videoHeight){reject(new Error('影片長度或尺寸無效。'));return;}Object.assign(clip,{width:probe.videoWidth,height:probe.videoHeight,duration:probe.duration});resolve();};
+  probe.onerror=()=>{clearTimeout(timer);reject(new Error('無法讀取影片資訊，請先分析影片或轉成可預覽的 MP4。'));};probe.src=url;
+ });}finally{probe.removeAttribute('src');probe.load();URL.revokeObjectURL(url);}
+}
+async function runQueue(clips,kind,approved=false){
+ if(state.busy||!enhanced())return;
+ state.stop=false;setBusy(true);let completed=0,failed=0;
+ try{
+  for(let i=0;i<clips.length;i++){
+   if(state.stop)break;
+   const clip=clips[i];clip.error='';clip.phase=kind==='analyze'?'完整辨識中':'輸出中';renderAll();
+   try{
+    if(kind==='render'){
+     await inspectLocalVideo(clip);
+     const normalized=C.validateCues(C.reflow(clip.cues,limit(clip)),clip.duration);
+     if(JSON.stringify(normalized)!==JSON.stringify(clip.cues)){remember(clip);clip.cues=normalized;dirty(clip);}
+    }
+    const projectId=await ensureMedia(clip);
+    const payload=kind==='analyze'?{projectId,approved}:{projectId,templateId:clip.templateId,cues:C.validateCues(C.reflow(clip.cues,limit(clip)),clip.duration||Infinity).map(({start,end,text})=>({start,end,text}))};
+    if(kind==='render'&&clip.kind==='photo')payload.stillDuration=clip.duration;
+    const start=await api('/api/'+kind,payload);const job=await poll(start.jobId,text=>{clip.phase=text;message((i+1)+'/'+clips.length+' · '+clip.name+' · '+text);$('clip-phase').textContent=selected()?.phase||'';});
+    if(kind==='analyze'){remember(clip);Object.assign(clip,{width:job.result.width,height:job.result.height,duration:job.result.duration});clip.cues=C.validateCues(job.result.cues,clip.duration);clip.groupPage=0;clip.cuePage=0;clip.phase='待校對';dirty(clip);}
+    else{clip.output={jobId:start.jobId,name:job.outputName,revision:clip.revision||0};clip.phase='輸出完成';}
+    completed++;
+   }catch(e){clip.phase='處理失敗';clip.error=e.message;failed++;}
+   renderAll();
+  }
+  activateStage(kind==='render'?'output':'process');
+  message((state.stop?'已停止後續處理；':'')+'完成 '+completed+'/'+clips.length+' 支'+(failed?'，'+failed+' 支失敗，可逐支重試。':'。'),failed?'error':'');
+ }finally{setBusy(false);}
+}
+function consent(title,description,summary,action){state.consent=action;$('consent-title').textContent=title;$('consent-description').textContent=description;$('consent-summary').textContent=summary;$('approve-network').checked=false;$('consent-error').textContent='';$('consent-dialog').showModal();}
+$('confirm-network').addEventListener('click',guard(async()=>{if(!$('approve-network').checked){$('consent-error').textContent='請先勾選本次資料與目的地的同意。';return;}const action=state.consent;state.consent=null;$('consent-dialog').close();if(action)await action();}));
+async function requestAnalyze(clips){
+ if(state.busy||!enhanced()||!clips.length)return;
+ const pending=C.speechCandidates(clips);if(!pending.length){message('沒有待辨識影片：照片可手動加字幕，已有字幕可直接校對。');activateStage('process');return;}
+ if(!await requireNetwork())return;
+ consent('完整辨識 '+pending.length+' 支影片','目的地：Groq；只傳送以下影片的音訊，依順序完整辨識，可能產生 API 費用，不會合併影片。',pending.map((c,i)=>(i+1)+'. '+c.relativeName).join('\n'),()=>runQueue(pending,'analyze',true));
+}
+$('analyze-all').addEventListener('click',guard(()=>requestAnalyze(state.clips.slice())));
+$('analyze-current').addEventListener('click',guard(()=>selected()&&requestAnalyze([selected()])));
+$('process-button').addEventListener('click',guard(async()=>{const c=selected();if(!c||(!c.cues.length&&c.kind!=='photo')){message('請先完成這支影片的字幕。','error');return;}await runQueue([c],'render');}));
+$('render-all').addEventListener('click',guard(()=>runQueue(state.clips.filter(c=>c.cues.length||c.kind==='photo'),'render')));
+$('stop-button').addEventListener('click',()=>{state.stop=true;message('會完成目前這支影片，之後不再開始下一支。');});
+async function openOutput(clip){if(!clip?.output)return;await api('/api/open-output',{jobId:clip.output.jobId});}
+$('open-output-button').addEventListener('click',guard(()=>openOutput(selected())));
+
+function download(name,body,type='application/json'){
+ const url=URL.createObjectURL(new Blob([body],{type})),link=make('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function downloadSrt(clip){try{download(displayName(clip)+'.srt',C.srt(C.reflow(clip.cues,limit(clip))),'text/plain;charset=utf-8');message('已匯出 '+clip.name+' 的字幕。');}catch(e){message(e.message,'error');}}
+$('save-work-button').addEventListener('click',guard(()=>{if(!hasClips())return;for(const c of state.clips)C.validateCues(c.cues,c.duration||Infinity);const body=JSON.stringify(C.exportWork(state.clips),null,2);if(new Blob([body]).size>8*1024*1024)throw new Error('工作檔超過 8 MB，請縮短未套用逐字稿或註解後再保存。');download('shine-private.subtitle-workspace.json',body);state.dirty=false;closeMenu();message('已匯出私人工作檔（字幕與註解，不含影片），請妥善保存。');}));
+$('load-work-button').addEventListener('click',()=>{if(!hasClips())return;closeMenu();$('work-input').click();});
+$('work-input').addEventListener('change',guard(async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>8*1024*1024)throw new Error('工作檔不得超過 8 MB。');const restored=C.importWork(JSON.parse(await file.text()),state.clips);state.clips=restored;state.removal=null;state.orderUndo=null;if(!state.clips.some(c=>c.id===state.selectedId)){state.selectedId=null;clearPreview();if(state.clips.length)selectClip(state.clips[0].id);}else if(selected()?.kind==='photo')state.photoTime=Math.min(state.photoTime,selected().duration);dirty();renderAll();updateClock();message('已載入字幕、註解與排序，影片仍使用你剛剛選取的本機檔案。');}finally{e.target.value='';}}));
+$('export-draft-button').addEventListener('click',()=>{const genericSettings={templateId:selected()?.templateId||'S01',portraitMaxChars:10,landscapeMaxChars:16,maxLines:2};download('shine-subtitle.template-draft.json',JSON.stringify({schema:'shine.template-editor-draft.v3',genericSettings},null,2));closeMenu();message('已匯出通用樣式草稿，不含字幕或媒體。');});
+
+async function requireNetwork(){
+ const response=await fetch('/api/capabilities',{headers:{'X-Workflow-Token':state.token},cache:'no-store'});
+ if(!response.ok){explain('請重新啟動程式','目前控制器可能仍是舊版。請先保存工作，關閉啟動終端機後，再雙擊 AI Video Workflow v7.command。');return false;}
+ const readiness=await response.json();if(!readiness.transcriptionReady){message('辨識服務尚未設定，可先用 SRT 或手動字幕。','error');explain('辨識服務尚未設定',readiness.message);return false;}return true;
+}
+async function requestOrder(){
+ if(!hasClips()||!enhanced()||state.busy)return;
+ if(!await requireNetwork())return;
+ if(state.clips.length>200){message('AI 排序一次限 200 支影片；目前可使用手動或檔名排序。','error');return;}
+ const items=state.clips.map(c=>({id:c.id,name:c.name})),snapshot=state.clips.map(c=>c.id);
+ consent('AI 排序建議','目的地：Groq；只傳送以下檔名與隨機識別碼，不傳影片或字幕，僅以檔名線索建議順序。',items.map((x,i)=>(i+1)+'. '+x.name).join('\n'),async()=>{
+  setBusy(true);try{const start=await api('/api/assistant',{action:'order',approved:true,items});const job=await poll(start.jobId,text=>message(text));C.applyOrder(state.clips,job.result.order);state.proposal={kind:'order',order:job.result.order,snapshot};showProposal();}finally{setBusy(false);}
+ });
+}
+$('ai-order').addEventListener('click',guard(requestOrder));
+$('ai-correct').addEventListener('click',guard(async()=>{
+ const c=selected();if(!c||!enhanced()||state.busy)return;
+ const items=c.cues.map((cue,index)=>({index,text:cue.text,note:cue.note.trim()})).filter(x=>x.note);
+ if(!items.length){message('請先在這支影片的字幕句或段落加上註解。','error');return;}
+ if(!await requireNetwork())return;
+ const revision=c.revision||0;
+ consent('AI 修正本片 '+items.length+' 句註解','目的地：Groq；只傳送以下字幕與你的註解，不傳影片；產生提案後由你確認，原時間不交給 AI 修改。',items.map(x=>'第 '+(x.index+1)+' 句：'+x.text+'\n註解：'+x.note).join('\n\n'),async()=>{
+  setBusy(true);try{const changes=[];for(let i=0;i<items.length;i+=40){message('AI 修正 '+Math.floor(i/40+1)+' / '+Math.ceil(items.length/40)+' 批…');const start=await api('/api/assistant',{action:'correct',approved:true,items:items.slice(i,i+40)});const job=await poll(start.jobId);changes.push(...job.result.changes);}C.applyCorrections(c.cues,changes);state.proposal={kind:'correct',clipId:c.id,revision,changes};showProposal();}finally{setBusy(false);}
+ });
+}));
+function showProposal(){
+ const proposal=state.proposal,list=$('proposal-list');list.replaceChildren();$('proposal-error').textContent='';
+ if(proposal.kind==='order'){$('proposal-title').textContent='AI 排序提案';const map=new Map(state.clips.map(c=>[c.id,c]));proposal.order.forEach((id,i)=>list.append(make('div',(i+1)+'. '+map.get(id).name,'proposal-row')));}
+ else{$('proposal-title').textContent='AI 字幕修正提案';const c=state.clips.find(x=>x.id===proposal.clipId);for(const change of proposal.changes){const row=make('div','','proposal-row');row.append(make('small','第 '+(change.index+1)+' 句'),make('del',c.cues[change.index].text),make('ins',change.text));list.append(row);}}
+ $('proposal-dialog').showModal();
+}
+$('apply-proposal').addEventListener('click',()=>{try{
+ const p=state.proposal;if(!p)return;
+ if(p.kind==='order'){if(state.clips.map(c=>c.id).join()!==p.snapshot.join())throw new Error('影片清單已改變，請重新提出排序建議。');state.orderUndo=state.clips.map(c=>c.id);state.clips=C.applyOrder(state.clips,p.order);dirty();renderAll();}
+ else{const c=state.clips.find(x=>x.id===p.clipId);if(!c||(c.revision||0)!==p.revision)throw new Error('原字幕已改變，請重新提出修正要求。');commit(c,C.reflow(C.applyCorrections(c.cues,p.changes),limit(c)));}
+ $('proposal-dialog').close();state.proposal=null;message('已套用提案，可使用復原回到套用前。');
+}catch(e){dialogError('proposal-error',e);}});
+function closeMenu(){$('main-menu').hidden=true;$('menu-button').setAttribute('aria-expanded','false');}
+$('menu-button').addEventListener('click',()=>{const open=$('main-menu').hidden;$('main-menu').hidden=!open;$('menu-button').setAttribute('aria-expanded',String(open));});
+document.addEventListener('click',e=>{if(!$('main-menu').contains(e.target)&&e.target!==$('menu-button'))closeMenu();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
+$('guide-button').addEventListener('click',()=>{closeMenu();$('guide-dialog').showModal();});
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));
+window.addEventListener('beforeunload',e=>{if(state.dirty||state.busy){e.preventDefault();e.returnValue='';}});
+async function connect(){
+ if(!/^https?:$/.test(location.protocol))return;
+ try{const r=await fetch('/api/status',{cache:'no-store'}),data=await r.json();if(r.ok&&data.schema==='shine.workflow.app-status.v1'&&data.token){state.mode='enhanced';state.token=data.token;$('controller-mode').dataset.mode='enhanced';$('controller-mode').textContent='增強版 · 本機';message('本機控制器已連線；請載入影片資料夾。');}}catch(_){message('本機控制器未連線，仍可使用離線字幕校對。');}
+}
+renderAll();connect();
+})();
+
+</script>
+</body>
+</html>

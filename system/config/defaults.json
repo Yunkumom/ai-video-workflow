@@ -1,0 +1,33 @@
+{
+  "schema": "shine.video.defaults.v1",
+  "language": "zh-TW",
+  "default_mode": "auto",
+  "aspect_ratio": "original",
+  "audio_mode": "original-audio",
+  "subtitles": {
+    "burn_in": true,
+    "export_srt": true,
+    "default_template": "S01",
+    "portrait_max_chars_per_line": 10,
+    "landscape_max_chars_per_line": 16,
+    "max_chars_per_cue": 28,
+    "max_lines": 2,
+    "font_name": "PingFang TC",
+    "font_size": 22
+  },
+  "tutorial": {
+    "silence_threshold_db": -40,
+    "min_silence_seconds": 1.2,
+    "keep_pause_seconds": 0.4,
+    "normalize_audio": true
+  },
+  "silent_footage": {
+    "preserve_source_order": true,
+    "invent_copy_without_script": false,
+    "still_image_seconds": 5.0
+  },
+  "music": {
+    "enabled": true,
+    "catalog_path": "system/config/music_catalog.json"
+  }
+}

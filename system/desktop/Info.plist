@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleExecutable</key><string>Editor</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>NSPrincipalClass</key><string>NSApplication</string>
+<key>NSDesktopFolderUsageDescription</key><string>讀取你選擇的影片素材，儲存字幕與生成新版影片。</string>
+<key>CFBundleIdentifier</key><string>local.video-editor.desktop</string>
+<key>CFBundleName</key><string>影片編輯器</string>
+<key>CFBundleVersion</key><string>7</string>
+<key>CFBundleShortVersionString</key><string>7.0</string>
+<key>NSHighResolutionCapable</key><true/>
+<key>NSAppTransportSecurity</key><dict><key>NSAllowsLocalNetworking</key><true/></dict>
+</dict></plist>

@@ -3,6 +3,12 @@
 A macOS-native subtitle-first program with one owner-facing flow: `1 Input → 2 Process → 3 Output`.
 這是一個字幕優先的 macOS 本機程式，擁有者只需要操作 `1 Input → 2 Process → 3 Output`。
 
+## GUI onboarding / GUI 入門
+
+`templates/editor.html` v2 includes Setup → Input → AI Analysis → Output guidance and the bilingual “Editor 編輯器” title. The checklist is manual; AI processing requires the local controller.
+
+`templates/editor.html` v2 已整合環境設定、素材資料夾、AI 分析與輸出指南，名稱採用「Editor 編輯器」。環境清單為手動確認；AI 處理仍需本機控制器。
+
 ## Open / 開啟
 
 1. Open `templates/editor.html` directly for the basic offline preview: select a video folder, load matching SRT or paste per-video transcripts, and review every cue against the picture.

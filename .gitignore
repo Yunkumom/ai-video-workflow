@@ -1,0 +1,125 @@
+# Operating-system and editor state / 作業系統與編輯器暫存
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.temp
+~$*
+*.swp
+
+# Environment / secrets / 環境變數與機密金鑰
+.env
+.env.*
+!.env.example
+!env.example
+*.key
+*.pem
+credentials.*
+secrets.*
+
+# Private video-processing directories / 私人影音處理目錄
+input/*
+!input/.gitkeep
+
+output/*
+!output/.gitkeep
+
+processing/*
+!processing/.gitkeep
+
+temp/*
+!temp/.gitkeep
+
+uploads/*
+!uploads/.gitkeep
+
+downloads/*
+!downloads/.gitkeep
+
+# Workflow numbered directories / 工作流程編號目錄
+1_input/**
+!1_input/
+!1_input/fixtures-safe/
+!1_input/fixtures-safe/.gitkeep
+2_processing/**
+!2_processing/
+!2_processing/.gitkeep
+3_output/**
+!3_output/
+!3_output/.gitkeep
+
+# Video files / 影片檔案
+*.mp4
+*.mov
+*.m4v
+*.avi
+*.mkv
+*.webm
+
+# Audio files / 音訊檔案
+*.mp3
+*.wav
+*.aac
+*.m4a
+*.flac
+
+# Generated media where appropriate / 字幕與生成媒體
+*.srt
+*.vtt
+
+# Image files / 圖片檔案
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.heic
+*.tif
+*.tiff
+
+# Python / Python 生成狀態
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node.js
+node_modules/
+
+# Logs and temporary files / 日誌與快取
+*.log
+.cache/
+
+# Retained / pending material / 保留與待辦區塊
+_pending/**
+!_pending/
+!_pending/.gitkeep
+_trash/**
+!_trash/
+!_trash/.gitkeep
+
+# Large recoverable legacy material / 大型可復原舊資料
+system/legacy/references/**
+system/legacy/windows/tools/**
+system/legacy/windows/venv-windows/**
+
+# Private owner brand and persona assets / 私人商標與角色素材
+system/desktop/yunkumom-mark.png
+system/presets/assets/persona/*.png
+system/presets/assets/persona/*.jpg
+system/presets/assets/persona/*.jpeg
+
+# Local template drafts and generated previews / 本機範本草稿與生成預覽
+*.template-draft.json
+*.subtitle-workspace.json
+templates/generated/
+templates/previews/
+template-gallery/generated/
+
+# Publishing credentials and queue runtime state / 發布憑證與佇列狀態
+*youtube*.json
+*client_secrets*.json
+*.token.json
+Publishing發布_agy/
+Queue待發布_agy/
+Published已發布_agy/

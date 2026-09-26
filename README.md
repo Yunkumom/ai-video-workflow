@@ -1,68 +1,178 @@
 # AI Video Workflow v7
 
-A macOS-native subtitle-first program with one owner-facing flow: `1 Input → 2 Process → 3 Output`.
-這是一個字幕優先的 macOS 本機程式，擁有者只需要操作 `1 Input → 2 Process → 3 Output`。
+A macOS-native, subtitle-first AI video editing workflow and desktop studio designed for high-efficiency content production: talking-head tutorials, travel vlogs, and dual-format releases (16:9 Landscape for YouTube & 9:16 Portrait for Instagram Reels, YouTube Shorts, and TikTok).
 
-## GUI onboarding / GUI 入門
+這是一個字幕優先、AI 輔助的 macOS 本機影音剪輯工作流與桌面工作室，專為高效影片製作打造：涵蓋口播教學、旅遊生活 Vlog 以及雙格式成片輸出（16:9 橫式 YouTube 與 9:16 直式 Instagram Reels / Shorts / TikTok）。
 
-`templates/editor.html` v2 includes Setup → Input → AI Analysis → Output guidance and the bilingual “Editor 編輯器” title. The checklist is manual; AI processing requires the local controller.
+---
 
-`templates/editor.html` v2 已整合環境設定、素材資料夾、AI 分析與輸出指南，名稱採用「Editor 編輯器」。環境清單為手動確認；AI 處理仍需本機控制器。
+## Interactive Guide / 互動操作指南
 
-## Open / 開啟
+Open [`guide.html`](guide.html) directly in any browser for an interactive, bilingual step-by-step visual walkthrough featuring dark/light themes, keyboard shortcuts, bookmarking, and audio read-aloud:
 
-1. Open `templates/editor.html` directly for the basic offline preview: select a video folder, load matching SRT or paste per-video transcripts, and review every cue against the picture.
-2. Double-click `AI Video Workflow v7.command` for the current desktop editor: create or open a project, then import media, edit, and generate output locally.
+直接在瀏覽器開啟 [`guide.html`](guide.html)，即可使用完整雙語互動指南：包含深淺色模式切換、鍵盤快捷鍵、個人書籤與語音朗讀。
 
-1. 直接開啟 `templates/editor.html` 使用陽春離線預覽：選擇影片資料夾、配對 SRT 或逐片貼上逐字稿、切句，並對照畫面逐句檢查。
-2. 雙擊 `AI Video Workflow v7.command` 使用目前的桌面編輯器：建立或開啟專案後，在本機匯入素材、編輯並生成輸出。
+```text
+01 Setup (環境設定) → 02 Input (放入素材) → 03 AI (分析製作) → 04 Output (查看成果) → 05 Editor (編輯微調)
+```
 
-中間的辨識與渲染資料保存在 `2_processing/`；擁有者仍只需使用 `1_input → 2_processing → 3_output` 三個區塊。
+---
 
-## 第一輪試用修正
+## 5-Step Workflow / 五步驟完整操作流程
 
-- 中央「＋」和右上角載入按鈕使用同一個資料夾選擇器。
-- Input 支援影片與 **JPG／JPEG／PNG 照片**混合排序；其他照片格式（含 HEIC）會提示略過，需先轉成 JPG／PNG，不會擅自轉檔或改原檔。
-- 每列「×」只從本次清單移除；「復原移除」保留最近一次移除項目的字幕、註解、順序及既有成果連結，不刪原檔或已匯入的工作副本。
-- Process 的「＋ 新增字幕」可從零加入文字與時間，也能補入空白時段；重疊或超出素材時間時拒絕套用，超長文字依既有字數限制切句。
-- 照片預設沿用 5 秒，可調 0.1～3600 秒並按「套用秒數」，有字幕時不能縮短到字幕結束之前。照片不送語音辨識；可輸出有字幕或無字幕的靜態 MP4（無音軌），不合併素材。奇數尺寸只在右／下補最多 1 像素供 H.264 編碼，不裁切。
-- 缺少 `GROQ_API_KEY` 時，會在批次匯入／辨識前顯示設定提示，不建立整批失敗工作。這只是前置檢查，**不等於已設定金鑰或驗證外部辨識服務**。程式不讀取 `.env` 或其他憑證檔；仍須擁有者設定啟動環境並重新啟動。
+### 01 · Setup 環境設定
 
-重試新版前請先保存私人工作檔，停止原先啟動程式的終端工作，再重新雙擊啟動器；只重新整理網頁不會更新仍在執行的 Python 控制器。若拿已處理 V1 試用，請連同**同名 SRT**載入；燒在畫面上的字幕不會自動變成可編輯字幕。
+Prepare the local environment before running AI transcription or rendering:
+在開始本機 AI 處理前，請先準備好基礎環境與工具：
 
-新的私人工作檔使用 `shine.subtitle-workspace.v2`，額外保存素材類型及照片秒數，也可還原舊 v1。若移除部分素材後保存，重新選取原資料夾並載入工作檔時，只還原保存的清單，不會把已移除項目自動加回。來源檔案依舊不會被刪除。
+1. **System Tools (系統工具)**:
+   ```bash
+   # Install via Homebrew / 使用 Homebrew 安裝
+   brew install python ffmpeg yt-dlp
 
-## Compact batch workbench / 緊湊批次工作台（2026-08-30）
+   # Install Apple Developer CLI / 安裝 macOS 建置工具
+   xcode-select --install
+   ```
+2. **Environment Variables & Secrets (環境變數設定)**:
+   ```bash
+   cp .env.example .env
+   ```
+   Add your `GROQ_API_KEY` into `.env` for speech-to-text transcription.
+   在 `.env` 中設定 `GROQ_API_KEY` 以啟用 Whisper 快速語音辨識。
+   > **Security Notice / 安全須知**: `.env` is strictly ignored by `.gitignore` and must NEVER be committed to Git. Real credentials stay 100% on your local machine.
+   > `.env` 受 `.gitignore` 嚴格防護，絕不提交至 GitHub；所有真實金鑰僅存放於本機。
 
-- **Input**：載入整個影片資料夾（包含子資料夾），或選多支影片；先依檔名自然排序，再用上下箭頭調整。每頁 6 支，同名 SRT 只與同一路徑的影片配對，隱藏檔案會略過。
-- **Process**：一次校對一支影片，切換影片、閱讀段落與字幕頁；每句都有開始／結束時間及註解。「分段／重切」可指定完整範圍、句數和段數；只分段保留時間，重切則依字數估算，仍須對照影片確認。
-- **Output**：逐支輸出 MP4／SRT，保留原長度、方向與原聲，不自動剪掉停頓、裁切或合併。這是字幕工作台輸出，不取代既有 Vlog／Reel 雙格式製作規格。
-- **☰ 選單**：開啟 GUI Guide，或保存／還原私人工作檔。Template 在 Process「樣式」彈窗中，Mature／Testing 分頁不另建資料夾。
+---
 
-私人工作檔 `*.subtitle-workspace.json` 包含相對檔名、排序、字幕、註解、未套用逐字稿與樣式 ID，不包含影片、絕對路徑或 API 金鑰。下次先選取相同資料夾再載入工作檔；檔案大小及修改時間必須符合，這不是內容雜湊驗證。工作檔限 8 MB、只手動保存，並由 Git 忽略；不要分享或提交。匯入舊工作後會標記既有成片需要重輸出。
+### 02 · Input 放入素材
 
-完整語音辨識依序處理每支影片全部音訊，長片每 10 分鐘一段，顯示進度並還原全片時間碼；任一段失敗不交付部分辨識結果。一次最多載入 1000 支影片；影片最長 48 小時，每片最多 10000 個字幕 cue。個別失敗不影響後續影片；「停止後續影片」會先完成目前這支。
+Organize media inside project folders under `1_input/` (or `input/`):
+將每部影片的素材整理於 `1_input/`（或 `input/`）專案資料夾中：
 
-AI 排序目前只根據檔名，不分析影像內容，單次限 200 支；AI 修正只傳送本片有註解的文字，每批 40 句。兩者均使用既有 Groq，需逐次勾選同意且啟動環境已有 `GROQ_API_KEY`，提案確認後才套用，可復原。這次驗證使用模擬 AI 回覆，未呼叫真實外部服務。
+```text
+1_input/
+  20260925_my_project/
+    001_intro.mp4
+    002_highlight.jpg
+    003_screen_recording.mov
+```
 
-離線版無需外部連線，可選資料夾、預覽、校對與匯出 SRT；MP4 渲染／完整語音辨識／AI 提案需增強版。瀏覽器須能預覽影片編碼；無法讀取的格式可先用增強版辨識取得資訊，或轉為 H.264 MP4。S01 保留貼字黑底；S03～S05 正式成片仍為靜態基礎，未新增動態效果。
+* **Supported Formats (支援格式)**: MP4, MOV, M4V, JPG, PNG.
+* **Photos as Highlights (照片重點)**: JPG/PNG photos are automatically integrated as 1.5–2.0s highlight scenes without cropping distortions. HEIC files should be converted to JPG/PNG before import.
+* **Auto-Standardization (自動標準化命名)**: Files can be automatically sorted chronologically by capture metadata and renamed to `YYYYMMDD_subject_001.ext`.
 
-官方服務參考：[Groq 語音辨識](https://console.groq.com/docs/speech-to-text)、[文字處理](https://console.groq.com/docs/text-chat)。
+---
 
-## Subtitle limits / 字幕限制
+### 03 · AI Analysis & Local Processing / AI 分析與本機製作
 
-- Portrait or square: at most 10 Chinese characters per line.
-- Landscape: at most 16 Chinese characters per line.
-- At most two lines; overflow becomes the next timed cue.
-- S01 black backgrounds fit each rendered line instead of creating one large band.
+Invoke local pipeline agents or the native desktop controller to process the raw footage:
+透過本機管線工具或桌面控制器處理原始素材：
 
-- 直式或方形：每行最多 10 個中文字。
-- 橫式：每行最多 16 個中文字。
-- 最多兩行，溢出內容會成為下一個有時間碼的 cue。
-- S01 黑底只貼合每一行實際文字，不再形成大片黑帶。
+* **Speech-to-Text (語音辨識與切句)**: Fast Whisper transcription generates accurately segmented bilingual subtitles (Chinese + English).
+* **Smart Cut & Hesitation Removal (口播智慧切除)**: Automatically detects and trims repeated takes, false starts, and unnatural pauses while preserving seamless audio continuity.
+* **Neural Bokeh Blur (人像景深虛化)**: Uses Apple Vision Neural Engine person segmentation to apply cinematic background blur for talking-head videos.
+* **Audio Ducking (背景配樂自動閃避)**: Balances original voice audio with selected light background music, dynamically lowering music volume whenever speech is active.
+* **Scene 1 Intro Card (高質感片頭封面圖)**: Generates a typography-rich opening hook graphic (1.5–2.5s) rendered via native Swift CoreText compositing.
 
-## Privacy / 隱私
+---
 
-The standalone program never uploads media; enhanced mode binds only to `127.0.0.1`. External transcription remains off unless the owner explicitly approves that exact video, and credentials are never read from `.env`, stored, displayed, or logged.
+### 04 · Output 查看成果
 
-陽春版不會上傳媒體；增強版只綁定 `127.0.0.1`。除非擁有者針對該支影片明確同意，否則外部轉錄維持關閉，憑證不得從 `.env` 讀取、保存、顯示或記錄。
+Review rendered outputs in `3_output/` (or `output/`):
+在 `3_output/`（或 `output/`）查看生成的成果：
+
+```text
+3_output/
+  20260925_my_project/
+    20260925_my_project_v1.mp4          # 1080x1920 9:16 Vertical (直式短影音)
+    20260925_my_project_v1_horizontal.mp4  # 1920x1080 16:9 Horizontal (橫式長影片)
+    20260925_my_project_v1.srt          # Synchronized subtitles (同名字幕檔)
+    20260925_my_project_v1.html         # Interactive review worksheet (互動審閱工作表)
+```
+
+* Rendered movies always use clean numeric versioning (`_v1.mp4`, `_v2.mp4`).
+* Intermediate state, extracted audio, and cache are preserved in `2_processing/` (or `processing/`) for non-destructive re-renders.
+
+---
+
+### 05 · Editor 編輯器微調與二次匯出
+
+Launch the dedicated studio editor to calibrate subtitles, adjust reframing, or trim clips:
+啟動專屬桌面編輯器或離線網頁編輯器進行校對與微調：
+
+1. **Native Desktop Editor (macOS 桌面編輯器 - 推薦)**:
+   Double-click `AI Video Workflow v7.command` or run:
+   ```bash
+   ./"AI Video Workflow v7.command"
+   ```
+   * Single-page workspace: Left media sidebar, center live preview, right bilingual captions, and bottom multi-track timeline.
+   * Drag-and-drop subtitle repositioning with live pointer anchor tracking.
+   * Dynamic bilingual subtitle sizing: Chinese base with 40%–90% adjustable English scale (default 70%).
+   * Reframing modes: Switch freely between **Crop to Fill** (center 9:16 cut) and **Full Frame + Blurred Extension**.
+   * One-click dual-format re-export.
+
+2. **Offline HTML Batch Editor (離線批次編輯器)**:
+   Open `templates/editor.html` directly in your browser, or launch with local transcription capabilities:
+   ```bash
+   ./"AI Video Workflow v7.command" --legacy-batch
+   ```
+
+---
+
+## Repository Structure / 目錄結構
+
+```text
+ai-video-workflow/
+├── GUIDE.html                      # Interactive visual user guide (雙語互動使用指南)
+├── AI Video Workflow v7.command    # One-click desktop launcher (macOS 桌面啟動器)
+├── input/                          # Public folder skeleton: raw media inputs (本地素材入口)
+├── processing/                     # Public folder skeleton: intermediate render state (中間處理區)
+├── output/                         # Public folder skeleton: final rendered videos (成果輸出區)
+├── temp/                           # Scratch and temporary conversion cache (暫存區)
+├── uploads/                        # Staged upload buffer (上傳緩衝區)
+├── downloads/                      # Downloaded reference media buffer (下載緩衝區)
+├── 1_input/                        # Legacy/working media input directory (工作素材目錄)
+├── 2_processing/                   # Working intermediate processing directory (工作處理目錄)
+├── 3_output/                       # Working rendered output directory (工作成果目錄)
+├── system/                         # Native macOS pipeline & desktop application
+│   ├── app.py                      # Batch server application
+│   ├── desktop_server.py           # Loopback controller for desktop AppKit app
+│   ├── editor_export.py            # Local FFmpeg rendering bridge
+│   ├── desktop/                    # Native Swift AppKit wrapper & UI assets
+│   ├── pipeline/                   # Python & Swift rendering modules (CoreText, Vision)
+│   └── tests/                      # Automated regression & browser interaction test suite
+├── templates/                      # HTML editor, UI designs, and subtitle presets
+│   ├── editor.html                 # Offline batch subtitle & preview editor
+│   └── catalog.json                # Approved subtitle styles catalog
+├── template-gallery/               # Subtitle animation style gallery & Swift renderer
+├── .env.example                    # Safe environment template (Zero secrets)
+├── .gitignore                      # Multi-layer privacy & security firewall
+└── README.md                       # Comprehensive workflow documentation
+```
+
+---
+
+## Security & Privacy Firewall / 隱私安全防護原則
+
+This repository strictly separates **public source code** from **private media and credentials**:
+
+1. **Source Code is Public; Media & Secrets are Strictly Private**:
+   * All raw videos (`.mp4`, `.mov`), audio tracks (`.mp3`, `.wav`), personal photos (`.jpg`, `.png`), and subtitles (`.srt`) are strictly excluded from Git tracking via multi-layer `.gitignore`.
+2. **Zero Credentials in Git**:
+   * API keys, tokens, and secrets must only live in local `.env` files. Templates (`.env.example`) provide placeholder variable names only.
+3. **Local Loopback Security**:
+   * The local controller binds exclusively to `127.0.0.1` using per-launch randomized session tokens and same-site cookies, preventing foreign origin access.
+4. **Mandatory Pre-Commit Checks**:
+   * Always verify `git status` and `git diff --cached` before committing to ensure no private media or secrets are staged.
+
+---
+
+## Subtitle Styling Specs / 字幕排版規範
+
+* **Character Limits (字數上限)**:
+  * Vertical (9:16) / Square: Max 10 Chinese characters per line.
+  * Horizontal (16:9): Max 16 Chinese characters per line.
+  * Maximum 2 lines per cue; overflow smoothly breaks into the next monotonic cue.
+* **Bilingual Ratio (雙語字級)**:
+  * Chinese font scale: 100% (bold white with high-contrast black outline, S02 standard).
+  * English font scale: 70% default (adjustable from 40% to 90%).
